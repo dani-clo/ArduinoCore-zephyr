@@ -253,6 +253,7 @@ tools.remoteocd.upload.pattern="{path}/{cmd}" upload "{build.path}/{build.projec
 
 tools.remoteocd.bootloader.params.verbose=
 tools.remoteocd.bootloader.params.quiet=
+tools.remoteocd.erase.pattern=
 tools.remoteocd.bootloader.pattern="{path}/{cmd}" upload "{runtime.platform.path}/firmwares/{bootloader.file}"
 
 #
