@@ -1,7 +1,7 @@
 #!/bin/sh
 
 REPO_URL="https://github.com/bcmi-labs/orchestrator.git"
-BRANCH_NAME="lucarin91/jomla-config-stuff"
+BRANCH_NAME="main"
 
 set -xe
 
