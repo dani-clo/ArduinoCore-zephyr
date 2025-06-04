@@ -12,6 +12,16 @@ giga.menu.debug.true=Debug
 giga.menu.debug.false.postbuild_debug=
 giga.menu.debug.true.postbuild_debug=-debug
 
+giga.menu.mode.llext=llext
+giga.menu.mode.linked=linked
+
+giga.menu.mode.linked.build.extra_ldflags=-lc -lm -lgcc -L{build.variant.path} -Wl,--wrap=random -Wl,--wrap=calloc -Wl,--wrap=free -Wl,--wrap=malloc -Wl,--wrap=realloc
+giga.menu.mode.linked.build.llext_link_flags=
+giga.menu.mode.linked.build.suffix=_linked
+giga.menu.mode.linked.build.ldscript={runtime.platform.path}/variants/_linked/linker_script.ld
+giga.menu.mode.linked.upload.extension=bin-zsk.bin
+giga.menu.mode.linked.postbuild_mode=-prelinked
+
 giga.build.zephyr_target=arduino_giga_r1//m7
 giga.build.zephyr_args=--shield arduino_giga_display_shield
 giga.build.zephyr_hals=hal_stm32
@@ -447,7 +457,7 @@ portentac33.menu.debug.true.postbuild_debug=-debug
 portentac33.menu.mode.llext=llext
 portentac33.menu.mode.linked=linked
 
-portentac33.menu.mode.linked.build.extra_ldflags=-lc -lm -lgcc -L{build.variant.path} -Wl,--wrap=random -Wl,--wrap=calloc -Wl,--wrap=free -Wl,--wrap=malloc -Wl,--wrap=realloc 
+portentac33.menu.mode.linked.build.extra_ldflags=-lc -lm -lgcc -L{build.variant.path} -Wl,--wrap=random -Wl,--wrap=calloc -Wl,--wrap=free -Wl,--wrap=malloc -Wl,--wrap=realloc
 portentac33.menu.mode.linked.build.llext_link_flags=
 portentac33.menu.mode.linked.build.suffix=_linked
 portentac33.menu.mode.linked.build.ldscript={runtime.platform.path}/variants/_linked/linker_script.ld
@@ -575,6 +585,16 @@ jomla.menu.debug.true=Debug
 
 jomla.menu.debug.false.postbuild_debug=
 jomla.menu.debug.true.postbuild_debug=-debug
+
+jomla.menu.mode.llext=llext
+jomla.menu.mode.linked=linked
+
+jomla.menu.mode.linked.build.extra_ldflags=-lc -lm -lgcc -L{build.variant.path} -Wl,--wrap=random -Wl,--wrap=calloc -Wl,--wrap=free -Wl,--wrap=malloc -Wl,--wrap=realloc
+jomla.menu.mode.linked.build.llext_link_flags=
+jomla.menu.mode.linked.build.suffix=_linked
+jomla.menu.mode.linked.build.ldscript={runtime.platform.path}/variants/_linked/linker_script.ld
+jomla.menu.mode.linked.upload.extension=bin-zsk.bin
+jomla.menu.mode.linked.postbuild_mode=-prelinked
 
 jomla.build.zephyr_target=b_u585i_iot02a
 jomla.build.zephyr_args=
