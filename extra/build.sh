@@ -92,14 +92,16 @@ done
 # Generate the provides.ld file for linked builds
 echo "Exporting provides.ld"
 READELF=${ZEPHYR_SDK_INSTALL_DIR}/arm-zephyr-eabi/bin/arm-zephyr-eabi-readelf
+GDB=${ZEPHYR_SDK_INSTALL_DIR}/arm-zephyr-eabi/bin/arm-zephyr-eabi-gdb
 $READELF --wide -s ${BUILD_DIR}/zephyr/zephyr.elf  | c++filt  | grep FUNC | awk -F' ' '{print "PROVIDE("$8" = 0x"$2");"}' > ${VARIANT_DIR}/provides.ld
 $READELF --wide -s ${BUILD_DIR}/zephyr/zephyr.elf  | c++filt  | grep kheap_llext_heap | awk -F' ' '{print "PROVIDE("$8" = 0x"$2");"}' >> ${VARIANT_DIR}/provides.ld
 $READELF --wide -s ${BUILD_DIR}/zephyr/zephyr.elf  | c++filt  | grep kheap_llext_heap | awk -F' ' '{print "PROVIDE(kheap_llext_heap_size = "$3");"}' >> ${VARIANT_DIR}/provides.ld
 $READELF --wide -s ${BUILD_DIR}/zephyr/zephyr.elf  | c++filt  | grep kheap__system_heap | awk -F' ' '{print "PROVIDE("$8" = 0x"$2");"}' >> ${VARIANT_DIR}/provides.ld
 $READELF --wide -s ${BUILD_DIR}/zephyr/zephyr.elf  | c++filt  | grep kheap__system_heap | awk -F' ' '{print "PROVIDE(kheap__system_heap_size = "$3");"}' >> ${VARIANT_DIR}/provides.ld
 cat ${BUILD_DIR}/zephyr/zephyr.map | grep __device_dts_ord | grep -v rodata | grep -v llext_const_symbol |  awk -F' ' '{print "PROVIDE("$2" = "$1");"}'  >> ${VARIANT_DIR}/provides.ld
-TEXT_START=`cat variants/$variant/$variant.overlay | grep user_sketch: | cut -f2 -d"@" | cut -f1 -d"{"`
-echo "PROVIDE(_sketch_start = 0x$TEXT_START);" >> ${VARIANT_DIR}/provides.ld
+#TEXT_START=`cat variants/$variant/$variant.overlay | grep user_sketch: | cut -f2 -d"@" | cut -f1 -d"{"`
+TEXT_START=`$GDB --quiet -ex "p/x sketch_base_addr" ${BUILD_DIR}/zephyr/zephyr.elf -ex "exit" | grep "= 0x" | cut -f 2 -d"="`
+echo "PROVIDE(_sketch_start = $TEXT_START);" >> ${VARIANT_DIR}/provides.ld
 
 sed -i 's/PROVIDE(malloc =/PROVIDE(__wrap_malloc =/g' ${VARIANT_DIR}/provides.ld
 sed -i 's/PROVIDE(free =/PROVIDE(__wrap_free =/g' ${VARIANT_DIR}/provides.ld
