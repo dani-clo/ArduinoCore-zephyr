@@ -70,8 +70,8 @@ bool Camera::begin(uint32_t width, uint32_t height, uint32_t pixformat, bool byt
     }
 
     // Get capabilities
-    struct video_caps caps = {0};
-    if (video_get_caps(this->vdev, VIDEO_EP_OUT, &caps)) {
+    struct video_caps caps;
+    if (video_get_caps(this->vdev, &caps)) {
         return false;
     }
 
@@ -96,7 +96,7 @@ bool Camera::begin(uint32_t width, uint32_t height, uint32_t pixformat, bool byt
         .pitch = width * 2,
     };
 
-	if (video_set_format(this->vdev, VIDEO_EP_OUT, &fmt)) {
+	if (video_set_format(this->vdev, &fmt)) {
         Serial.println("Failed to set video format");
 		return false;
 	}
@@ -110,11 +110,11 @@ bool Camera::begin(uint32_t width, uint32_t height, uint32_t pixformat, bool byt
             Serial.println("Failed to allocate video buffers");
 			return false;
 		}
-		video_enqueue(this->vdev, VIDEO_EP_OUT, this->vbuf[i]);
+		video_enqueue(this->vdev, this->vbuf[i]);
 	}
 
 	// Start video capture
-	if (video_stream_start(this->vdev)) {
+	if (video_stream_start(this->vdev, VIDEO_BUF_TYPE_OUTPUT)) {
         Serial.println("Failed to start capture");
 		return false;
 	}
@@ -127,7 +127,7 @@ bool Camera::grabFrame(FrameBuffer &fb, uint32_t timeout) {
         return false;
     }
 
-    if (video_dequeue(this->vdev, VIDEO_EP_OUT, &fb.vbuf, K_MSEC(timeout))) {
+    if (video_dequeue(this->vdev, &fb.vbuf, K_MSEC(timeout))) {
         return false;
     }
 
@@ -154,7 +154,7 @@ bool Camera::releaseFrame(FrameBuffer &fb) {
         return false;
     }
 
-    if (video_enqueue(this->vdev, VIDEO_EP_OUT, fb.vbuf)) {
+    if (video_enqueue(this->vdev, fb.vbuf)) {
         return false;
 	}
 
@@ -162,9 +162,11 @@ bool Camera::releaseFrame(FrameBuffer &fb) {
 }
 
 bool Camera::setVerticalFlip(bool flip_enable) {
-    return video_set_ctrl(this->vdev, VIDEO_CID_VFLIP, (void *) flip_enable) == 0;
+  struct video_control ctrl = {.id = VIDEO_CID_VFLIP, .val = flip_enable};
+    return video_set_ctrl(this->vdev, &ctrl) == 0;
 }
 
 bool Camera::setHorizontalMirror(bool mirror_enable) {
-    return video_set_ctrl(this->vdev, VIDEO_CID_HFLIP, (void *) mirror_enable) == 0;
+    struct video_control ctrl = {.id = VIDEO_CID_HFLIP, .val = mirror_enable};
+    return video_set_ctrl(this->vdev, &ctrl) == 0;
 }
