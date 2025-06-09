@@ -21,7 +21,7 @@ manifest:
   projects:
     - name: zephyr
       remote: arduino
-      revision: zephyr-arduino-20250520
+      revision: zephyr-arduino-20250529
       import:
         name-allowlist:
           - cmsis
@@ -32,6 +32,7 @@ manifest:
           - segger
           - thrift
           - mcuboot
+          - nanopb
           - lvgl
         path-allowlist:
           - modules/hal/*

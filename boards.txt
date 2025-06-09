@@ -24,7 +24,7 @@ giga.menu.mode.linked.postbuild_mode=-prelinked
 
 giga.build.zephyr_target=arduino_giga_r1//m7
 giga.build.zephyr_args=--shield arduino_giga_display_shield
-giga.build.zephyr_hals=hal_stm32
+giga.build.zephyr_hals=hal_stm32 hal_infineon
 giga.build.variant=arduino_giga_r1_stm32h747xx_m7
 giga.build.mcu=cortex-m7
 giga.build.fpu=-mfpu=fpv5-d16
@@ -466,7 +466,7 @@ portentac33.menu.mode.linked.postbuild_mode=-prelinked
 
 portentac33.build.zephyr_target=arduino_portenta_c33
 portentac33.build.zephyr_args=
-portentac33.build.zephyr_hals=hal_renesas
+portentac33.build.zephyr_hals=hal_renesas nanopb
 portentac33.build.variant=arduino_portenta_c33_r7fa6m5bh3cfc
 portentac33.build.mcu=cortex-m33
 portentac33.build.fpu=-mfpu=fpv5-sp-d16
