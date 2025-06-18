@@ -186,11 +186,11 @@ jobs:
   publish-core:
     name: Publish core
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'arduino/ArduinoCore-zephyr' }}
+    if: startsWith(github.ref, 'refs/tags/') && github.event_name == 'push' && github.repository == 'bcmi-labs/ArduinoCore-zephyr'
     needs:
       - package-core
       - test-core
-    environment: production
+    environment: staging
     permissions:
       id-token: write
       contents: read
@@ -205,16 +205,21 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.IAM_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: 'us-east-1'
+          role-to-assume: "arn:aws:iam::257442868231:role/static-website/ArduinoCore-zephyr"
+          role-session-name: "GHA_to_AWS_via_OIDC_for_ArduinoCore-zephyr"
 
       - name: Upload artifact
-        run: aws s3 cp ${{ env.ARTIFACT_FILE }} s3://${{ secrets.S3_BUCKET }}/
+        run: aws s3 cp ${{ env.ARTIFACT_FILE }} s3://apt-repo.oniudra.cc/
 
   publish-json:
     name: Publish json
+    environment: staging
+    permissions:
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.repository == 'arduino/ArduinoCore-zephyr' }}
+    if: startsWith(github.ref, 'refs/tags/') && github.event_name == 'push' && github.repository == 'bcmi-labs/ArduinoCore-zephyr'
     needs:
       - package-core
       - test-core
@@ -223,7 +228,7 @@ jobs:
       CORE_ARTIFACT: ${{ needs.package-core.outputs.CORE_ARTIFACT }}
       ARTIFACT_FILE: ${{ needs.package-core.outputs.CORE_ARTIFACT }}.tar.bz2
       CORE_TAG: ${{ needs.package-core.outputs.CORE_TAG }}
-      PACKAGE_INDEX_JSON: zephyr-core-${{ needs.package-core.outputs.CORE_TAG }}.json
+      PACKAGE_INDEX_JSON: zephyr-core-jomla.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -239,10 +244,24 @@ jobs:
 
         # uses: ARTIFACT_FILE CORE_TAG PACKAGE_INDEX_JSON
       - name: Prepare package index snippet
-        run: ./extra/gen_package_index_json.sh
+        run: |
+          ./extra/gen_package_index_json.sh
+          # Replaces downloads with the temporary private bucket. It is okay to write the pw in plain text in this case.
+          # The reason is because we will distribute this and hardcode it in plain text anyway, for the sample boards we'll ship.
+          sed -i "s#https://downloads.arduino.cc/cores/zephyr/#https://arduino:aptexperiment@apt-repo.oniudra.cc/#" ${{ env.PACKAGE_INDEX_JSON }}
 
       - name: Archive package index snippet
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PACKAGE_INDEX_JSON }}
           path: ${{ env.PACKAGE_INDEX_JSON }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: 'us-east-1'
+          role-to-assume: "arn:aws:iam::257442868231:role/static-website/ArduinoCore-zephyr"
+          role-session-name: "GHA_to_AWS_via_OIDC_for_ArduinoCore-zephyr"
+
+      - name: Upload artifact
+        run: aws s3 cp ${{ env.PACKAGE_INDEX_JSON }} s3://apt-repo.oniudra.cc/
