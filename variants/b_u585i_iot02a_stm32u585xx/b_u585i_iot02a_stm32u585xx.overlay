@@ -20,7 +20,7 @@
 
 
 &clk_hse {
-	clock-frequency = <DT_FREQ_M(16)>;
+	clock-frequency = <DT_FREQ_M(8)>;
 	status = "okay";
 };
 
@@ -28,16 +28,6 @@
 	clock-frequency = <32768>;
 	status = "okay";
 };
-
-/*
-&rcc {
-	clock-frequency = <DT_FREQ_M(40)>;
-};
-
-&pll1 {
-	mul-n = <20>;
-};
-*/
 
 &lpuart1 {
 	pinctrl-0 = <&lpuart1_tx_pg7 &lpuart1_rx_pg8
@@ -78,12 +68,6 @@
 &gpiog {
 	status = "okay";
 };
-
-/*
-&adc1 {
-	status = "disabled";
-};
-*/
 
 &adc1 {
 	pinctrl-0 = <&adc1_in9_pa4
@@ -178,12 +162,12 @@
 						<&gpioc 2 GPIO_ACTIVE_HIGH>,  /* JSPI */
 						<&gpioc 3 GPIO_ACTIVE_HIGH>,
 						<&gpiod 1 GPIO_ACTIVE_HIGH>,
-						<&gpioc 4 GPIO_ACTIVE_LOW>,	  /* LEDs */
-						<&gpioc 5 GPIO_ACTIVE_LOW>,
-						<&gpioc 6 GPIO_ACTIVE_LOW>,
-						<&gpioc 7 GPIO_ACTIVE_LOW>,
-						<&gpioc 8 GPIO_ACTIVE_LOW>,
-						<&gpioc 9 GPIO_ACTIVE_LOW>,
+						<&gpioh 10 GPIO_ACTIVE_LOW>,
+						<&gpioh 11 GPIO_ACTIVE_LOW>,
+						<&gpioh 12 GPIO_ACTIVE_LOW>,
+						<&gpioh 13 GPIO_ACTIVE_LOW>,
+						<&gpioh 14 GPIO_ACTIVE_LOW>,
+						<&gpioh 15 GPIO_ACTIVE_LOW>,
 						<&gpioa 4 GPIO_ACTIVE_LOW>,	  /* ADCs */
 						<&gpioa 5 GPIO_ACTIVE_LOW>,
 						<&gpioa 6 GPIO_ACTIVE_LOW>,
@@ -204,12 +188,12 @@
 						<&gpiog 13 GPIO_ACTIVE_LOW>,  /* Internal SPI RDY */
 						<&gpioh 3 GPIO_ACTIVE_LOW>;   /* BOOT0 */
 
-		builtin-led-gpios = <&gpioc 4 GPIO_ACTIVE_LOW>,
-				<&gpioc 5 GPIO_ACTIVE_LOW>,
-				<&gpioc 6 GPIO_ACTIVE_LOW>,
-				<&gpioc 7 GPIO_ACTIVE_LOW>,
-				<&gpioc 8 GPIO_ACTIVE_LOW>,
-				<&gpioc 9 GPIO_ACTIVE_LOW>;
+		builtin-led-gpios = <&gpioh 10 GPIO_ACTIVE_LOW>,
+				<&gpioh 11 GPIO_ACTIVE_LOW>,
+				<&gpioh 12 GPIO_ACTIVE_LOW>,
+				<&gpioh 13 GPIO_ACTIVE_LOW>,
+				<&gpioh 14 GPIO_ACTIVE_LOW>,
+				<&gpioh 15 GPIO_ACTIVE_LOW>;
 
 		pwm-pin-gpios =	<>;
 
