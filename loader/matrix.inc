@@ -121,7 +121,7 @@ static uint8_t __attribute__((aligned)) framebuffer[NUM_MATRIX_LEDS / 8];
 static uint8_t __attribute__((aligned)) framebuffer_color[NUM_MATRIX_LEDS];
 
 static void turnLed(int idx, bool on) {
-    GPIOF->MODER = 0;
+    GPIOF->MODER &= ~(0xFFFFFF);
 
     if (on) {
         GPIOF->BSRR |= (1 << (idxToPin(pins[idx][0])) | 1 << (idxToPin(pins[idx][1]) + 16));
