@@ -1,10 +1,3 @@
-&zephyr_udc0 {
-	board_cdc_acm_uart: board_cdc_acm_uart {
-		compatible = "zephyr,cdc-acm-uart";
-	status = "okay";
-	};
-};
-
 /delete-node/ &uart4;
 /delete-node/ &usart3;
 /delete-node/ &smbus1;
@@ -14,9 +7,9 @@
 
 / {
 	chosen {
-		zephyr,console = &usart1;
-		zephyr,shell-uart = &usart1;
-		zephyr,bt-hci = &usart1;
+		zephyr,console = &lpuart1;
+		zephyr,shell-uart = &lpuart1;
+		zephyr,bt-hci = &lpuart1; // TODO remove
 		zephyr,camera = &dcmi;
 	};
 };
@@ -252,8 +245,7 @@
 					<&gpioc 1 0>,
 					<&gpioc 0 0>;
 
-		serials = <&board_cdc_acm_uart>, <&lpuart1>, <&usart1>;
-		cdc-acm = <&board_cdc_acm_uart>;
+		serials = <&usart1>, <&lpuart1>;
 		i2cs = <&i2c2>, <&i2c4>;
 		spis = <&spi3>;
 		pwms = <>;
