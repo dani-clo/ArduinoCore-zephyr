@@ -186,55 +186,87 @@
 
 / {
 	zephyr,user {
-		digital-pin-gpios = <&gpiob 7 GPIO_ACTIVE_HIGH>,
-						<&gpiob 6 GPIO_ACTIVE_HIGH>,
-						<&gpiob 3 GPIO_ACTIVE_HIGH>,
-						<&gpiob 0 GPIO_ACTIVE_HIGH>,
-						<&gpioa 12 GPIO_ACTIVE_HIGH>,
-						<&gpioa 11 GPIO_ACTIVE_HIGH>,
-						<&gpiob 1 GPIO_ACTIVE_HIGH>,
-						<&gpiob 2 GPIO_ACTIVE_HIGH>,
-						<&gpiob 4 GPIO_ACTIVE_HIGH>,
-						<&gpiob 8 GPIO_ACTIVE_HIGH>,
-						<&gpiob 9 GPIO_ACTIVE_HIGH>,
-						<&gpiob 15 GPIO_ACTIVE_HIGH>,
-						<&gpiob 14 GPIO_ACTIVE_HIGH>,
-						<&gpiob 13 GPIO_ACTIVE_HIGH>,
-						<&gpioc 2 GPIO_ACTIVE_HIGH>,  /* JSPI */
-						<&gpioc 3 GPIO_ACTIVE_HIGH>,
-						<&gpiod 1 GPIO_ACTIVE_HIGH>,
-						<&gpioh 10 GPIO_ACTIVE_LOW>,
-						<&gpioh 11 GPIO_ACTIVE_LOW>,
-						<&gpioh 12 GPIO_ACTIVE_LOW>,
-						<&gpioh 13 GPIO_ACTIVE_LOW>,
-						<&gpioh 14 GPIO_ACTIVE_LOW>,
-						<&gpioh 15 GPIO_ACTIVE_LOW>,
-						<&gpioa 4 GPIO_ACTIVE_LOW>,	  /* ADCs */
-						<&gpioa 5 GPIO_ACTIVE_LOW>,
-						<&gpioa 6 GPIO_ACTIVE_LOW>,
-						<&gpioa 7 GPIO_ACTIVE_LOW>,
-						<&gpioc 1 GPIO_ACTIVE_LOW>,
-						<&gpioc 0 GPIO_ACTIVE_LOW>,
-						<&gpiof 0 GPIO_ACTIVE_LOW>,     /* LED matrix */
-						<&gpiof 1 GPIO_ACTIVE_LOW>,
-						<&gpiof 2 GPIO_ACTIVE_LOW>,
-						<&gpiof 3 GPIO_ACTIVE_LOW>,
-						<&gpiof 4 GPIO_ACTIVE_LOW>,
-						<&gpiof 5 GPIO_ACTIVE_LOW>,
-						<&gpiof 6 GPIO_ACTIVE_LOW>,
-						<&gpiof 7 GPIO_ACTIVE_LOW>,
-						<&gpiof 8 GPIO_ACTIVE_LOW>,
-						<&gpiof 9 GPIO_ACTIVE_LOW>,
-						<&gpiof 10 GPIO_ACTIVE_LOW>,
-						<&gpiog 13 GPIO_ACTIVE_LOW>,  /* Internal SPI RDY */
-						<&gpioh 3 GPIO_ACTIVE_LOW>;   /* BOOT0 */
+		digital-pin-gpios = <&gpiob 7 GPIO_ACTIVE_HIGH>,        /* JDIGITAL */
+				    <&gpiob 6 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 3 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 0 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 12 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 11 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 1 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 2 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 4 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 8 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 9 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 15 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 14 GPIO_ACTIVE_HIGH>,
+				    <&gpiob 13 GPIO_ACTIVE_HIGH>,
 
-		builtin-led-gpios = <&gpioh 10 GPIO_ACTIVE_LOW>,
-				<&gpioh 11 GPIO_ACTIVE_LOW>,
-				<&gpioh 12 GPIO_ACTIVE_LOW>,
-				<&gpioh 13 GPIO_ACTIVE_LOW>,
-				<&gpioh 14 GPIO_ACTIVE_LOW>,
-				<&gpioh 15 GPIO_ACTIVE_LOW>;
+				    <&gpioa 4 GPIO_ACTIVE_HIGH>,	/* ADCs */
+				    <&gpioa 5 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 6 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 7 GPIO_ACTIVE_HIGH>,
+				    <&gpioc 1 GPIO_ACTIVE_HIGH>,
+				    <&gpioc 0 GPIO_ACTIVE_HIGH>,
+
+				    <&gpioc 2 GPIO_ACTIVE_HIGH>,        /* JSPI */
+				    <&gpioc 3 GPIO_ACTIVE_HIGH>,
+				    <&gpiod 1 GPIO_ACTIVE_HIGH>,
+
+				    <&gpiob 11 GPIO_ACTIVE_HIGH>,       /* JDIGITAL SDA/SCL */
+				    <&gpiob 10 GPIO_ACTIVE_HIGH>,
+									
+				    <&gpioc 6 GPIO_ACTIVE_HIGH>,	/* JMISC */
+				    <&gpioc 7 GPIO_ACTIVE_HIGH>,
+				    <&gpioc 8 GPIO_ACTIVE_HIGH>,
+				    <&gpiod 2 GPIO_ACTIVE_HIGH>,
+				    <&gpioc 9 GPIO_ACTIVE_HIGH>,
+				    <&gpioe 2 GPIO_ACTIVE_HIGH>,
+				    <&gpioe 4 GPIO_ACTIVE_HIGH>,
+				    <&gpioe 3 GPIO_ACTIVE_HIGH>,
+				    <&gpioi 4 GPIO_ACTIVE_HIGH>,
+				    <&gpioe 5 GPIO_ACTIVE_HIGH>,
+				    <&gpioi 6 GPIO_ACTIVE_HIGH>,
+				    <&gpioe 6 GPIO_ACTIVE_HIGH>,
+				    <&gpioi 7 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 8 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 14 GPIO_ACTIVE_HIGH>,
+				    <&gpiod 9 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 15 GPIO_ACTIVE_HIGH>,
+				    <&gpioi 5 GPIO_ACTIVE_HIGH>,
+				    <&gpiod 8 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 3 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 10 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 0 GPIO_ACTIVE_HIGH>,
+				    <&gpioa 1 GPIO_ACTIVE_HIGH>,
+									
+				    <&gpioh 10 GPIO_ACTIVE_HIGH>,        /* LEDs */
+				    <&gpioh 11 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 12 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 13 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 14 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 15 GPIO_ACTIVE_HIGH>,
+
+				    <&gpiof 0 GPIO_ACTIVE_HIGH>,        /* LED matrix */
+				    <&gpiof 1 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 2 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 3 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 4 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 5 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 6 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 7 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 8 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 9 GPIO_ACTIVE_HIGH>,
+				    <&gpiof 10 GPIO_ACTIVE_HIGH>,
+
+				    <&gpiog 13 GPIO_ACTIVE_HIGH>,       /* Internal SPI RDY */
+				    <&gpioh 3 GPIO_ACTIVE_HIGH>;        /* BOOT0 */
+
+		builtin-led-gpios = <&gpioh 10 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 11 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 12 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 13 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 14 GPIO_ACTIVE_HIGH>,
+				    <&gpioh 15 GPIO_ACTIVE_HIGH>;
 
 		pwm-pin-gpios =	<>;
 
