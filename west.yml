@@ -20,8 +20,8 @@ manifest:
 
   projects:
     - name: zephyr
-      remote: arduino
-      revision: zephyr-arduino-20250529
+      remote: pillo79
+      revision: stm32
       import:
         name-allowlist:
           - cmsis
