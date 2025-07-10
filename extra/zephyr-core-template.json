@@ -1,7 +1,7 @@
 {
   "packages": [
     {
-      "name": "dev",
+      "name": "arduino",
       "maintainer": "Arduino",
       "websiteURL": "https://www.arduino.cc/",
       "email": "packages@arduino.cc",
@@ -23,12 +23,12 @@
           },
           "boards": [
             {
-              "name": "Arduino Jomla"
+              "name": "Arduino UNO Q"
             }
           ],
           "toolsDependencies": [
             {
-              "packager": "dev",
+              "packager": "arduino-dev",
               "name": "arm-zephyr-eabi",
               "version": "0.16.8"
             },
@@ -43,18 +43,39 @@
               "version": "0.11.0-arduino5"
             },
             {
-              "packager": "dev",
+              "packager": "arduino-dev",
               "name": "zephyr-post-build-tool",
               "version": "0.1.0"
             },
             {
-              "packager": "dev",
+              "packager": "arduio-dev",
               "name": "zephyr-sketch-tool",
               "version": "0.1.0"
+            },
+            {
+              "packager": "arduino",
+              "name": "adb",
+              "version": "32.0.0"
+            },
+            {
+              "packager": "arduino-dev",
+              "name": "remoteocd",
+              "version": "0.0.1-rc.15"
             }
           ]
         }
       ],
+      "tools": []
+    },
+    {
+      "name": "arduino-dev",
+      "maintainer": "Arduino",
+      "websiteURL": "https://www.arduino.cc/",
+      "email": "packages@arduino.cc",
+      "help": {
+        "online": "https://www.arduino.cc/en/Reference/HomePage"
+      },
+      "platforms": [],
       "tools": [
         {
           "name": "zephyr-post-build-tool",
@@ -230,6 +251,54 @@
               "archiveFileName": "toolchain_linux-x86_64_arm-zephyr-eabi.tar.xz",
               "checksum": "SHA-256:2f77a13e419e9b3bf113cb54eab6060869719477a459453434ec2f4ad536611d",
               "size": 98080576
+            }
+          ]
+        },
+        {
+          "name": "remoteocd",
+          "version": "0.0.1-rc.15",
+          "systems": [
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://arduino:aptexperiment@apt-repo.oniudra.cc/tools/remoteocd-0.0.1-rc.15-darwin-amd64.tar.gz",
+              "archiveFileName": "remoteocd-0.0.1-rc.15-darwin-amd64.tar.gz",
+              "checksum": "SHA-256:2a2fd8343e7068e42bf2d9cd8fb1b12a02605ff6e60b93e11a37a3eaeaaf4859",
+              "size": 18997514
+            },
+            {
+              "host": "arm64-apple-darwin",
+              "url": "https://arduino:aptexperiment@apt-repo.oniudra.cc/tools/remoteocd-0.0.1-rc.15-darwin-arm64.tar.gz",
+              "archiveFileName": "remoteocd-0.0.1-rc.15-darwin-arm64.tar.gz",
+              "checksum": "SHA-256:409923ad7f3bf93e91cf7c8e4b0303080604c1ceb10eb0d985032d9fc363a82c",
+              "size": 18479106
+            },
+            {
+              "host": "x86_64-linux-gnu",
+              "url": "https://arduino:aptexperiment@apt-repo.oniudra.cc/tools/remoteocd-0.0.1-rc.15-linux-amd64.tar.gz",
+              "archiveFileName": "remoteocd-0.0.1-rc.15-linux-amd64.tar.gz",
+              "checksum": "SHA-256:9b59e6af6f12f0af459b10109935490c989e0fe8fa67796f173d529cb46bc35d",
+              "size": 19224549
+            },
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://arduino:aptexperiment@apt-repo.oniudra.cc/tools/remoteocd-0.0.1-rc.15-linux-arm64.tar.gz",
+              "archiveFileName": "remoteocd-0.0.1-rc.15-linux-arm64.tar.gz",
+              "checksum": "SHA-256:ab722c4e099750739947d3c3fe599de4727ece03550a2c5a61b2dc5d500b162b",
+              "size": 18319615
+            },
+            {
+              "host": "x86_64-mingw32",
+              "url": "https://arduino:aptexperiment@apt-repo.oniudra.cc/tools/remoteocd-0.0.1-rc.15-windows-amd64.zip",
+              "archiveFileName": "remoteocd-0.0.1-rc.15-windows-amd64.zip",
+              "checksum": "SHA-256:38377966722d20d506792a5fd9d01cef785c5328ff3f9f0147c7336b15ec9ffd",
+              "size": 19343428
+            },
+            {
+              "host": "arm64-mingw32",
+              "url": "https://arduino:aptexperiment@apt-repo.oniudra.cc/tools/remoteocd-0.0.1-rc.15-windows-arm64.zip",
+              "archiveFileName": "remoteocd-0.0.1-rc.15-windows-arm64.zip",
+              "checksum": "SHA-256:c0cb2d6ede146ab258a1f7b3142b0bcaa18ce24eed60991a1934d06ffcb4a2ca",
+              "size": 18405121
             }
           ]
         }
