@@ -21,6 +21,11 @@ void __attribute__((weak))initVariant(void) {
 
 }
 
+// This function can be overwriten by one library.
+void __attribute__((weak))__loopHook(void) {
+
+}
+
 
 int main(void) {
 #if (DT_NODE_HAS_PROP(DT_PATH(zephyr_user), cdc_acm) && CONFIG_USB_CDC_ACM)
@@ -37,9 +42,7 @@ int main(void) {
 
   for (;;) {
     loop();
-  #if 0 //(DT_NODE_HAS_PROP(DT_PATH(zephyr_user), cdc_acm) && CONFIG_USB_CDC_ACM) || DT_NODE_HAS_PROP(DT_PATH(zephyr_user), serials)
-    if (arduino::serialEventRun) arduino::serialEventRun();
-  #endif
+    __loopHook();
   }
 
   return 0;
