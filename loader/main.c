@@ -18,6 +18,7 @@ LOG_MODULE_REGISTER(app);
 #include <stdlib.h>
 #include <zephyr/drivers/uart/cdc_acm.h>
 #include <zephyr/drivers/uart.h>
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/usb/usb_device.h>
 
 #define HEADER_LEN 16
@@ -31,6 +32,7 @@ struct sketch_header_v1 {
 
 #define SKETCH_FLAG_DEBUG       0x01
 #define SKETCH_FLAG_LINKED      0x02
+#define SKETCH_FLAG_IMMEDIATE   0x04
 
 #define TARGET_HAS_USB_CDC_SHELL \
 	DT_NODE_HAS_PROP(DT_PATH(zephyr_user), cdc_acm) && CONFIG_SHELL && CONFIG_USB_DEVICE_STACK
@@ -89,21 +91,38 @@ static int loader(const struct shell *sh)
 		return rc;
 	}
 
-	#if defined(CONFIG_BOARD_B_U585I_IOT02A)
-	void matrixBegin(void);
-	matrixBegin();
-	#endif
-
+	bool sketch_valid = true;
 	struct sketch_header_v1 *sketch_hdr = (struct sketch_header_v1 *)(header + 7);
 	if (sketch_hdr->ver != 0x1 || sketch_hdr->magic != 0x2341) {
 		printk("Invalid sketch header\n");
-		return -EINVAL;
+		sketch_valid = false;
+		// This is not a valid sketch, but try to start a shell anyway
 	}
+
+	#if defined(CONFIG_BOARD_B_U585I_IOT02A)
+	void matrixBegin(void);
+	void matrixPlay(uint8_t* buf, uint32_t len);
+	void matrixSetGrayscaleBits(uint8_t _max);
+	#include "bootanimation.h"
+
+	if ((!sketch_valid) || !(sketch_hdr->flags & SKETCH_FLAG_IMMEDIATE)) {
+		// Start the bootanimation while waiting for the MPU to boot
+		const struct gpio_dt_spec spec = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user),
+														control_gpios, 0);
+		matrixBegin();
+		matrixSetGrayscaleBits(8);
+		while (gpio_pin_get_dt(&spec) == 0) {
+			printk("Waiting for MPU to boot...\n");
+			matrixPlay(bootanimation, bootanimation_len);
+		}
+		//matrixPlay(bootanimation_end, bootanimation_end_len);
+	}
+	#endif
 
 	size_t sketch_buf_len = sketch_hdr->len;
 
 #if TARGET_HAS_USB_CDC_SHELL
-	int debug = sketch_hdr->flags & SKETCH_FLAG_DEBUG;
+	int debug = (!sketch_valid) || (sketch_hdr->flags & SKETCH_FLAG_DEBUG);
 	if (debug && strcmp(k_thread_name_get(k_current_get()), "main") == 0) {
 		// disables default shell on UART
 		shell_uninit(shell_backend_uart_get_ptr(), NULL);

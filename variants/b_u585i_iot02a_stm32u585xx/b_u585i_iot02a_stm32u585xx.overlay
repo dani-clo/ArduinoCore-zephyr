@@ -257,7 +257,6 @@
 				    <&gpiof 8 GPIO_ACTIVE_HIGH>,
 				    <&gpiof 9 GPIO_ACTIVE_HIGH>,
 				    <&gpiof 10 GPIO_ACTIVE_HIGH>,
-
 				    <&gpiog 13 GPIO_ACTIVE_HIGH>,       /* Internal SPI RDY */
 				    <&gpioh 3 GPIO_ACTIVE_HIGH>;        /* BOOT0 */
 
@@ -281,6 +280,9 @@
 		i2cs = <&i2c2>, <&i2c4>;
 		spis = <&spi3>;
 		pwms = <>;
+
+		//control-gpios = <&gpiog 13 GPIO_ACTIVE_HIGH>;    /* Internal SPI RDY */
+		control-gpios = <&gpiog 12 GPIO_ACTIVE_HIGH>;       /* SPI CS */
 
 		io-channels =	<&adc1 9>,
 				<&adc1 10>,
