@@ -575,7 +575,7 @@ opta.debug.svd_file={runtime.platform.path}/svd/STM32H747_CM7.svd
 
 ##############################################################################################################
 
-unoq.name=Jomla
+unoq.name=Uno Q
 unoq.build.core=arduino
 unoq.build.crossprefix=arm-zephyr-eabi-
 unoq.build.compiler_path={runtime.tools.arm-zephyr-eabi-0.16.8.path}/bin/
