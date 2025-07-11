@@ -7,9 +7,9 @@
 
 / {
 	chosen {
-		zephyr,console = &lpuart1;
-		zephyr,shell-uart = &lpuart1;
-		zephyr,bt-hci = &lpuart1; // TODO remove
+		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
+		zephyr,bt-hci = &usart1; // TODO remove
 		zephyr,camera = &dcmi;
 	};
 };
