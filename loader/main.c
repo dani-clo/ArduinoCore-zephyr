@@ -103,6 +103,7 @@ static int loader(const struct shell *sh)
 	void matrixBegin(void);
 	void matrixPlay(uint8_t* buf, uint32_t len);
 	void matrixSetGrayscaleBits(uint8_t _max);
+	void matrixGrayscaleWrite(uint8_t* buf);
 	#include "bootanimation.h"
 
 	if ((!sketch_valid) || !(sketch_hdr->flags & SKETCH_FLAG_IMMEDIATE)) {
@@ -116,6 +117,8 @@ static int loader(const struct shell *sh)
 			matrixPlay(bootanimation, bootanimation_len);
 		}
 		matrixPlay(bootanimation_end, bootanimation_end_len);
+		uint8_t _framebuffer[104] = {0};
+		matrixGrayscaleWrite(_framebuffer);
 	}
 	#endif
 
