@@ -113,10 +113,9 @@ static int loader(const struct shell *sh)
 		matrixSetGrayscaleBits(8);
 		gpio_pin_configure_dt(&spec, GPIO_INPUT);
 		while (gpio_pin_get_dt(&spec) == 0) {
-			printk("Waiting for MPU to boot...\n");
 			matrixPlay(bootanimation, bootanimation_len);
 		}
-		//matrixPlay(bootanimation_end, bootanimation_end_len);
+		matrixPlay(bootanimation_end, bootanimation_end_len);
 	}
 	#endif
 
