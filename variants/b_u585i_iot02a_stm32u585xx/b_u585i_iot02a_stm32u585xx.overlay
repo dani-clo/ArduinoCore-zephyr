@@ -285,8 +285,7 @@
 		spis = <&spi3>;
 		pwms = <>;
 
-		//control-gpios = <&gpiog 13 GPIO_ACTIVE_HIGH>;    /* Internal SPI RDY */
-		control-gpios = <&gpiog 12 GPIO_ACTIVE_HIGH>;       /* SPI CS */
+		control-gpios = <&gpiog 13 GPIO_ACTIVE_HIGH>;    /* Internal SPI RDY */
 
 		io-channels =	<&adc1 9>,
 				<&adc1 10>,
