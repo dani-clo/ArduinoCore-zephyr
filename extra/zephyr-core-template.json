@@ -10,7 +10,7 @@
       },
       "platforms": [
         {
-          "name": "Arduino Q Boards",
+          "name": "Arduino Zephyr Boards (llext)",
           "architecture": "zephyr",
           "version": "__CORE_TAG__",
           "category": "Arduino",
@@ -28,7 +28,7 @@
           ],
           "toolsDependencies": [
             {
-              "packager": "arduino-dev",
+              "packager": "zephyr",
               "name": "arm-zephyr-eabi",
               "version": "0.16.8"
             },
@@ -43,12 +43,12 @@
               "version": "0.11.0-arduino5"
             },
             {
-              "packager": "arduino-dev",
+              "packager": "arduino",
               "name": "zephyr-post-build-tool",
               "version": "0.1.0"
             },
             {
-              "packager": "arduio-dev",
+              "packager": "arduino",
               "name": "zephyr-sketch-tool",
               "version": "0.1.0"
             },
@@ -58,202 +58,14 @@
               "version": "32.0.0"
             },
             {
-              "packager": "arduino-dev",
+              "packager": "arduino",
               "name": "remoteocd",
               "version": "0.0.1-rc.15"
             }
           ]
         }
       ],
-      "tools": []
-    },
-    {
-      "name": "arduino-dev",
-      "maintainer": "Arduino",
-      "websiteURL": "https://www.arduino.cc/",
-      "email": "packages@arduino.cc",
-      "help": {
-        "online": "https://www.arduino.cc/en/Reference/HomePage"
-      },
-      "platforms": [],
       "tools": [
-        {
-          "name": "zephyr-post-build-tool",
-          "version": "0.1.0",
-          "systems": [
-            {
-              "host": "aarch64-linux-gnu",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.1.0-linux_arm64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.1.0-linux_arm64.tar.bz2",
-              "checksum": "SHA-256:6979f75c9abfc3766559ce771c6616dd51a417d8912a4364ef63bc0afebb6bfd",
-              "size": "1433014"
-            },
-            {
-              "host": "i386-apple-darwin11",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.1.0-macos_amd64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.1.0-macos_amd64.tar.gz",
-              "checksum": "SHA-256:4348fb3aea22d3ccd66282c84ad6cc54889d502878c33be29015d7058ca68637",
-              "size": "1514291"
-            },
-            {
-              "host": "i686-mingw32",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.1.0-windows_386.zip",
-              "archiveFileName": "zephyr-post-build-tool-0.1.0-windows_386.zip",
-              "checksum": "SHA-256:49db8eaea6cc3a8029ba2a63119ec37fa9f9588d3fca3993cec9f43d40e6b29b",
-              "size": "1504995"
-            },
-            {
-              "host": "x86_64-linux-gnu",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.1.0-linux_amd64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.1.0-linux_amd64.tar.gz",
-              "checksum": "SHA-256:06deedd4279ab2f33d87f76f12ab74bf41df21c5018b93f492020edf94dc96e0",
-              "size": "1518719"
-            }
-          ]
-        },
-        {
-          "name": "zephyr-post-build-tool",
-          "version": "0.0.2",
-          "systems": [
-            {
-              "host": "aarch64-linux-gnu",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.0.2-linux_arm64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.0.2-linux_arm64.tar.bz2",
-              "checksum": "SHA-256:d8786f48236b6425c39e6ecefb955ba93d425e1bb947f4b6a4720e168c1081cb",
-              "size": "1187806"
-            },
-            {
-              "host": "i386-apple-darwin11",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.0.2-macos_amd64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.0.2-macos_amd64.tar.gz",
-              "checksum": "SHA-256:8892ba21dcebfc1631725c3c5da85aff05684da978d0585dcac4679664b19ae1",
-              "size": "1243024"
-            },
-            {
-              "host": "i686-mingw32",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.0.2-windows_386.zip",
-              "archiveFileName": "zephyr-post-build-tool-0.0.2-windows_386.zip",
-              "checksum": "SHA-256:42c99632e45e47747ba5e8310cee420d7cc04aad8fea742adec877b0f233f413",
-              "size": "1232893"
-            },
-            {
-              "host": "x86_64-linux-gnu",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.0.2-linux_amd64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.0.2-linux_amd64.tar.gz",
-              "checksum": "SHA-256:56bad506c99d2cabda7fd6bc6591f52b103ac4b2ffefcee613306c6ac6ea2ec3",
-              "size": "1249392"
-            }
-          ]
-        },
-        {
-          "name": "zephyr-post-build-tool",
-          "version": "0.0.1",
-          "systems": [
-            {
-              "host": "aarch64-linux-gnu",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.0.1-linux-arm64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.0.1-linux-arm.tar.bz2",
-              "checksum": "SHA-256:2a399efdf9c94eab3097f8bfc535e7585634f7f103f3aac51c52e9fbd6863c51",
-              "size": "1186835"
-            },
-            {
-              "host": "i386-apple-darwin11",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.0.1-macos_amd64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.0.1-macos_amd64.tar.gz",
-              "checksum": "SHA-256:7f0bf1a5c2a2548c4d4faf081d8956d403a5de3d55e082bcd77660f01b47de10",
-              "size": "1243020"
-            },
-            {
-              "host": "i686-mingw32",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.0.1-windows_386.zip",
-              "archiveFileName": "zephyr-post-build-tool-0.0.1-windows_386.zip",
-              "checksum": "SHA-256:f4547d401363666f8ec29fce12ec12f4500188a7035f6ce840be48c98cf5fd40",
-              "size": "1232672"
-            },
-            {
-              "host": "x86_64-linux-gnu",
-              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.0.1-linux_amd64.tar.gz",
-              "archiveFileName": "zephyr-post-build-tool-0.0.1-linux_amd64.tar.gz",
-              "checksum": "SHA-256:8286db4cdd7dd8aeb8587c233de8a88b3b8168b85f053aa64cd5a58856676fa2",
-              "size": "1249164"
-            }
-          ]
-        },
-        {
-          "name": "zephyr-sketch-tool",
-          "version": "0.1.0",
-          "systems": [
-            {
-              "host": "aarch64-linux-gnu",
-              "url": "https://downloads.arduino.cc/tools/zephyr-sketch-tool-0.1.0-aarch64-linux-gnu.tar.gz",
-              "archiveFileName": "zephyr-sketch-tool-0.1.0-aarch64-linux-gnu.tar.gz",
-              "checksum": "SHA-256:390cb3150a438e339bb910a667400e39f5448974dc8ce7e901b2412759559e88",
-              "size": "1433267"
-            },
-            {
-              "host": "i386-apple-darwin11",
-              "url": "https://downloads.arduino.cc/tools/zephyr-sketch-tool-0.1.0-i386-apple-darwin11.tar.gz",
-              "archiveFileName": "zephyr-sketch-tool-0.1.0-i386-apple-darwin11.tar.gz",
-              "checksum": "SHA-256:fe41be25015dfbabfd9e41bc33636c9c3d02d655dcd411eeed69b0d8de4198b1",
-              "size": "1514452"
-            },
-            {
-              "host": "i686-mingw32",
-              "url": "https://downloads.arduino.cc/tools/zephyr-sketch-tool-0.1.0-i686-mingw32.zip",
-              "archiveFileName": "zephyr-sketch-tool-0.1.0-i686-mingw32.zip",
-              "checksum": "SHA-256:6468aa9199dbfa5c6fc5cef7c63f8947c724919d429d4009ee7ae9aa154726be",
-              "size": "1505226"
-            },
-            {
-              "host": "x86_64-linux-gnu",
-              "url": "https://downloads.arduino.cc/tools/zephyr-sketch-tool-0.1.0-x86_64-linux-gnu.tar.gz",
-              "archiveFileName": "zephyr-sketch-tool-0.1.0-x86_64-linux-gnu.tar.gz",
-              "checksum": "SHA-256:bf7225a8812b44251469e043928bd580f7d951d9f2023a8fe6d14a0453a75342",
-              "size": "1518835"
-            }
-          ]
-        },
-        {
-          "name": "arm-zephyr-eabi",
-          "version": "0.16.8",
-          "systems": [
-            {
-              "host": "aarch64-linux-gnu",
-              "url": "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_linux-aarch64_arm-zephyr-eabi.tar.xz",
-              "archiveFileName": "toolchain_linux-aarch64_arm-zephyr-eabi.tar.xz",
-              "checksum": "SHA-256:40be45463b5c2ddcdcb6a2a490c7f0dc6df18599659ef435ae1197becd50d747",
-              "size": 94733496
-            },
-            {
-              "host": "arm64-apple-darwin",
-              "url": "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_macos-aarch64_arm-zephyr-eabi.tar.xz",
-              "archiveFileName": "toolchain_macos-aarch64_arm-zephyr-eabi.tar.xz",
-              "checksum": "SHA-256:91986ff78f4de0c401de7fb8cb4094ea6dc5112a9e60c8c757372ac54516baa2",
-              "size": 85438248
-            },
-            {
-              "host": "i686-mingw32",
-              "url": "https://downloads.arduino.cc/tools/zephyr/toolchain_windows-x86_64_arm-zephyr-eabi.tar.xz",
-              "archiveFileName": "toolchain_windows-x86_64_arm-zephyr-eabi.tar.xz",
-              "checksum": "SHA-256:94f1156e6291490e4952fc8a5278cb9bb0af888b1cde15c280348ff98133a490",
-              "size": 103423932
-            },
-            {
-              "host": "x86_64-apple-darwin",
-              "url": "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_macos-x86_64_arm-zephyr-eabi.tar.xz",
-              "archiveFileName": "toolchain_macos-x86_64_arm-zephyr-eabi.tar.xz",
-              "checksum": "SHA-256:2bc24fff7b8ec3ed785022563e5d913191203a0bd32eeb38903840bfdef4b955",
-              "size": 96974864
-            },
-            {
-              "host": "x86_64-linux-gnu",
-              "url": "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_linux-x86_64_arm-zephyr-eabi.tar.xz",
-              "archiveFileName": "toolchain_linux-x86_64_arm-zephyr-eabi.tar.xz",
-              "checksum": "SHA-256:2f77a13e419e9b3bf113cb54eab6060869719477a459453434ec2f4ad536611d",
-              "size": 98080576
-            }
-          ]
-        },
         {
           "name": "remoteocd",
           "version": "0.0.1-rc.15",
@@ -299,6 +111,127 @@
               "archiveFileName": "remoteocd-0.0.1-rc.15-windows-arm64.zip",
               "checksum": "SHA-256:c0cb2d6ede146ab258a1f7b3142b0bcaa18ce24eed60991a1934d06ffcb4a2ca",
               "size": 18405121
+            }
+          ]
+        },
+        {
+          "name": "zephyr-post-build-tool",
+          "version": "0.1.0",
+          "systems": [
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.1.0-linux_arm64.tar.gz",
+              "archiveFileName": "zephyr-post-build-tool-0.1.0-linux_arm64.tar.bz2",
+              "checksum": "SHA-256:6979f75c9abfc3766559ce771c6616dd51a417d8912a4364ef63bc0afebb6bfd",
+              "size": "1433014"
+            },
+            {
+              "host": "i386-apple-darwin11",
+              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.1.0-macos_amd64.tar.gz",
+              "archiveFileName": "zephyr-post-build-tool-0.1.0-macos_amd64.tar.gz",
+              "checksum": "SHA-256:4348fb3aea22d3ccd66282c84ad6cc54889d502878c33be29015d7058ca68637",
+              "size": "1514291"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.1.0-windows_386.zip",
+              "archiveFileName": "zephyr-post-build-tool-0.1.0-windows_386.zip",
+              "checksum": "SHA-256:49db8eaea6cc3a8029ba2a63119ec37fa9f9588d3fca3993cec9f43d40e6b29b",
+              "size": "1504995"
+            },
+            {
+              "host": "x86_64-linux-gnu",
+              "url": "https://downloads.arduino.cc/tools/zephyr-post-build-tool-0.1.0-linux_amd64.tar.gz",
+              "archiveFileName": "zephyr-post-build-tool-0.1.0-linux_amd64.tar.gz",
+              "checksum": "SHA-256:06deedd4279ab2f33d87f76f12ab74bf41df21c5018b93f492020edf94dc96e0",
+              "size": "1518719"
+            }
+          ]
+        },
+        {
+          "name": "zephyr-sketch-tool",
+          "version": "0.1.0",
+          "systems": [
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://downloads.arduino.cc/tools/zephyr-sketch-tool-0.1.0-aarch64-linux-gnu.tar.gz",
+              "archiveFileName": "zephyr-sketch-tool-0.1.0-aarch64-linux-gnu.tar.gz",
+              "checksum": "SHA-256:390cb3150a438e339bb910a667400e39f5448974dc8ce7e901b2412759559e88",
+              "size": "1433267"
+            },
+            {
+              "host": "i386-apple-darwin11",
+              "url": "https://downloads.arduino.cc/tools/zephyr-sketch-tool-0.1.0-i386-apple-darwin11.tar.gz",
+              "archiveFileName": "zephyr-sketch-tool-0.1.0-i386-apple-darwin11.tar.gz",
+              "checksum": "SHA-256:fe41be25015dfbabfd9e41bc33636c9c3d02d655dcd411eeed69b0d8de4198b1",
+              "size": "1514452"
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://downloads.arduino.cc/tools/zephyr-sketch-tool-0.1.0-i686-mingw32.zip",
+              "archiveFileName": "zephyr-sketch-tool-0.1.0-i686-mingw32.zip",
+              "checksum": "SHA-256:6468aa9199dbfa5c6fc5cef7c63f8947c724919d429d4009ee7ae9aa154726be",
+              "size": "1505226"
+            },
+            {
+              "host": "x86_64-linux-gnu",
+              "url": "https://downloads.arduino.cc/tools/zephyr-sketch-tool-0.1.0-x86_64-linux-gnu.tar.gz",
+              "archiveFileName": "zephyr-sketch-tool-0.1.0-x86_64-linux-gnu.tar.gz",
+              "checksum": "SHA-256:bf7225a8812b44251469e043928bd580f7d951d9f2023a8fe6d14a0453a75342",
+              "size": "1518835"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "zephyr",
+      "maintainer": "The Zephyr Project",
+      "websiteURL": "https://zephyrproject.org/",
+      "email": "packages@arduino.cc",
+      "help": {
+        "online": "https://docs.zephyrproject.org/latest/"
+      },
+      "platforms": [],
+      "tools": [
+        {
+          "name": "arm-zephyr-eabi",
+          "version": "0.16.8",
+          "systems": [
+            {
+              "host": "aarch64-linux-gnu",
+              "url": "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_linux-aarch64_arm-zephyr-eabi.tar.xz",
+              "archiveFileName": "toolchain_linux-aarch64_arm-zephyr-eabi.tar.xz",
+              "checksum": "SHA-256:40be45463b5c2ddcdcb6a2a490c7f0dc6df18599659ef435ae1197becd50d747",
+              "size": 94733496
+            },
+            {
+              "host": "arm64-apple-darwin",
+              "url": "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_macos-aarch64_arm-zephyr-eabi.tar.xz",
+              "archiveFileName": "toolchain_macos-aarch64_arm-zephyr-eabi.tar.xz",
+              "checksum": "SHA-256:91986ff78f4de0c401de7fb8cb4094ea6dc5112a9e60c8c757372ac54516baa2",
+              "size": 85438248
+            },
+            {
+              "host": "i686-mingw32",
+              "url": "https://downloads.arduino.cc/tools/zephyr/toolchain_windows-x86_64_arm-zephyr-eabi.tar.xz",
+              "archiveFileName": "toolchain_windows-x86_64_arm-zephyr-eabi.tar.xz",
+              "checksum": "SHA-256:94f1156e6291490e4952fc8a5278cb9bb0af888b1cde15c280348ff98133a490",
+              "size": 103423932
+            },
+            {
+              "host": "x86_64-apple-darwin",
+              "url": "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_macos-x86_64_arm-zephyr-eabi.tar.xz",
+              "archiveFileName": "toolchain_macos-x86_64_arm-zephyr-eabi.tar.xz",
+              "checksum": "SHA-256:2bc24fff7b8ec3ed785022563e5d913191203a0bd32eeb38903840bfdef4b955",
+              "size": 96974864
+            },
+            {
+              "host": "x86_64-linux-gnu",
+              "url": "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/toolchain_linux-x86_64_arm-zephyr-eabi.tar.xz",
+              "archiveFileName": "toolchain_linux-x86_64_arm-zephyr-eabi.tar.xz",
+              "checksum": "SHA-256:2f77a13e419e9b3bf113cb54eab6060869719477a459453434ec2f4ad536611d",
+              "size": 98080576
             }
           ]
         }
