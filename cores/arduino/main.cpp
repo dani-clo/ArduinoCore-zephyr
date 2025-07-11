@@ -16,16 +16,19 @@ void start_static_threads();
 #endif
 
 
-// This function will be overwriten by most variants.
+// This function will be overwritten by most variants.
 void __attribute__((weak))initVariant(void) {
 
 }
 
-// This function can be overwriten by one library.
+// This function can be overwritten by one library.
+void __attribute__((weak))__setupHook(void) {
+
+}
+// This function can be overwritten by one library.
 void __attribute__((weak))__loopHook(void) {
 
 }
-
 
 int main(void) {
 #if (DT_NODE_HAS_PROP(DT_PATH(zephyr_user), cdc_acm) && CONFIG_USB_CDC_ACM)
@@ -39,6 +42,7 @@ int main(void) {
 #endif
 
   setup();
+  __setupHook();
 
   for (;;) {
     loop();
