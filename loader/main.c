@@ -110,16 +110,19 @@ static int loader(const struct shell *sh)
 		// Start the bootanimation while waiting for the MPU to boot
 		const struct gpio_dt_spec spec = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user),
 														control_gpios, 0);
-		matrixBegin();
-		matrixSetGrayscaleBits(8);
+
 		gpio_pin_configure_dt(&spec, GPIO_INPUT | GPIO_PULL_DOWN);
 		k_sleep(K_MSEC(100));
-		while (gpio_pin_get_dt(&spec) == 0) {
-			matrixPlay(bootanimation, bootanimation_len);
+		if (gpio_pin_get_dt(&spec) == 0) {
+			matrixBegin();
+			matrixSetGrayscaleBits(8);
+			while (gpio_pin_get_dt(&spec) == 0) {
+				matrixPlay(bootanimation, bootanimation_len);
+			}
+			matrixPlay(bootanimation_end, bootanimation_end_len);
+			uint8_t _framebuffer[104] = {0};
+			matrixGrayscaleWrite(_framebuffer);
 		}
-		matrixPlay(bootanimation_end, bootanimation_end_len);
-		uint8_t _framebuffer[104] = {0};
-		matrixGrayscaleWrite(_framebuffer);
 	}
 	#endif
 
