@@ -114,6 +114,7 @@ static int loader(const struct shell *sh)
 		matrixBegin();
 		matrixSetGrayscaleBits(8);
 		gpio_pin_configure_dt(&spec, GPIO_INPUT | GPIO_PULL_DOWN);
+		k_sleep(K_MSEC(100));
 		while (gpio_pin_get_dt(&spec) == 0) {
 			matrixPlay(bootanimation, bootanimation_len);
 		}
