@@ -102,6 +102,7 @@ static int loader(const struct shell *sh)
 
 	#if defined(CONFIG_BOARD_B_U585I_IOT02A)
 	void matrixBegin(void);
+	void matrixEnd(void);
 	void matrixPlay(uint8_t* buf, uint32_t len);
 	void matrixSetGrayscaleBits(uint8_t _max);
 	void matrixGrayscaleWrite(uint8_t* buf);
@@ -123,6 +124,8 @@ static int loader(const struct shell *sh)
 			matrixPlay(bootanimation_end, bootanimation_end_len);
 			uint8_t _framebuffer[104] = {0};
 			matrixGrayscaleWrite(_framebuffer);
+			k_sleep(K_MSEC(10));
+			matrixEnd();
 		}
 	}
 	#endif
