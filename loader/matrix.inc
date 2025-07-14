@@ -212,6 +212,12 @@ void matrixBegin() {
     }
 }
 
+void matrixEnd() {
+    const struct device *const counter_dev = DEVICE_DT_GET(TIMER);
+    counter_stop(counter_dev);
+}
+
+
 void matrixPlay(uint8_t* buf, uint32_t len) {
     int i = 0;
     while (i < (len / 104)) {
