@@ -114,7 +114,7 @@ static int loader(const struct shell *sh)
 														control_gpios, 0);
 
 		gpio_pin_configure_dt(&spec, GPIO_INPUT | GPIO_PULL_DOWN);
-		k_sleep(K_MSEC(100));
+		k_sleep(K_MSEC(200));
 		if (gpio_pin_get_dt(&spec) == 0) {
 			matrixBegin();
 			matrixSetGrayscaleBits(8);
