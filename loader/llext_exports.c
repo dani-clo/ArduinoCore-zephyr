@@ -247,4 +247,5 @@ FORCE_EXPORT_SYM(matrixWrite);
 FORCE_EXPORT_SYM(matrixPlay);
 FORCE_EXPORT_SYM(matrixGrayscaleWrite);
 FORCE_EXPORT_SYM(matrixSetGrayscaleBits);
+FORCE_EXPORT_SYM(matrixEnd);
 #endif
