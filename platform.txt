@@ -263,6 +263,20 @@ tools.adb.upload.params.quiet=
 tools.adb.upload.pattern="{path}/{cmd}" push "{build.path}/{build.project_name}.elf" "/tmp/arduino/m4-user-sketch.elf"
 
 #
+# REMOTEOCD
+#
+tools.remoteocd.path={runtime.tools.remoteocd.path}
+tools.remoteocd.cmd=remoteocd
+tools.remoteocd.upload.params.verbose=
+tools.remoteocd.upload.params.quiet=
+tools.remoteocd.upload.pattern="{path}/{cmd}" --adb-path {runtime.tools.adb.path}/adb -s "{upload.port.properties.serialNumber}" upload -a "{upload.address}" "{build.path}/{build.project_name}.{upload.extension}"
+
+tools.remoteocd.bootloader.params.verbose=
+tools.remoteocd.bootloader.params.quiet=
+tools.remoteocd.erase.pattern=
+tools.remoteocd.bootloader.pattern="{path}/{cmd}" --adb-path {runtime.tools.adb.path}/adb -s "{upload.port.properties.serialNumber}" upload "{runtime.platform.path}/firmwares/{bootloader.file}"
+
+#
 # PYOCD WRAPPER
 #
 
