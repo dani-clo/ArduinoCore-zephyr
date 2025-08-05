@@ -194,7 +194,7 @@ void matrixSetGrayscaleBits(uint8_t _max) {
     _max_grayscale_bits = _max;
 }
 
-#define TIMER DT_INST(0, st_stm32_counter)
+#define TIMER DT_NODELABEL(counter_matrix)
 
 void matrixBegin() {
 	const struct device *const counter_dev = DEVICE_DT_GET(TIMER);

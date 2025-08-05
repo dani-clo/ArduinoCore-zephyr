@@ -179,12 +179,24 @@
 	};
 };
 
+&timers16 {
+	status = "okay";
+	st,prescaler = <4>;
+
+	counter_servo: counter {
+		status = "okay";
+		label = "SERVO_COUNTER";
+	};
+};
+
+
 &timers17 {
 	status = "okay";
 	st,prescaler = <4>;
 
-	counter {
+	counter_matrix: counter {
 		status = "okay";
+		label = "LED_MATRIX_COUNTER";
 	};
 };
 
