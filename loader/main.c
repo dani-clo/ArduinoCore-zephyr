@@ -108,6 +108,31 @@ static int loader(const struct shell *sh)
 	void matrixGrayscaleWrite(uint8_t* buf);
 	#include "bootanimation.h"
 
+	uint8_t* _bootanimation = bootanimation;
+	size_t _bootanimation_len = bootanimation_len;
+	uint8_t* _bootanimation_end = bootanimation_end;
+	size_t _bootanimation_end_len = bootanimation_end_len;
+
+	__attribute__((packed)) struct bootanimation_user_data {
+		size_t magic; // must be 0xBA for bootanimation
+		size_t len_loop;
+		size_t len_end;
+		size_t empty;
+		char* buf_loop;
+	};
+
+	uintptr_t bootanimation_addr = DT_REG_ADDR(DT_GPARENT(DT_NODELABEL(bootanimation))) +
+			      DT_REG_ADDR(DT_NODELABEL(bootanimation));
+
+	struct bootanimation_user_data *user_bootanimation = (struct bootanimation_user_data *)bootanimation_addr;
+	if (user_bootanimation->magic == 0xBA) {
+		_bootanimation = &(user_bootanimation->buf_loop);
+		_bootanimation_len = user_bootanimation->len_loop;
+		_bootanimation_end_len = user_bootanimation->len_end;
+		uint32_t tmp = user_bootanimation->buf_loop + user_bootanimation->len_loop;
+		_bootanimation_end = &tmp;
+	}
+
 	if ((!sketch_valid) || !(sketch_hdr->flags & SKETCH_FLAG_IMMEDIATE)) {
 		// Start the bootanimation while waiting for the MPU to boot
 		const struct gpio_dt_spec spec = GPIO_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user),
@@ -119,9 +144,9 @@ static int loader(const struct shell *sh)
 			matrixBegin();
 			matrixSetGrayscaleBits(8);
 			while (gpio_pin_get_dt(&spec) == 0) {
-				matrixPlay(bootanimation, bootanimation_len);
+				matrixPlay(_bootanimation, _bootanimation_len);
 			}
-			matrixPlay(bootanimation_end, bootanimation_end_len);
+			matrixPlay(_bootanimation_end, _bootanimation_end_len);
 			uint8_t _framebuffer[104] = {0};
 			matrixGrayscaleWrite(_framebuffer);
 			k_sleep(K_MSEC(10));
