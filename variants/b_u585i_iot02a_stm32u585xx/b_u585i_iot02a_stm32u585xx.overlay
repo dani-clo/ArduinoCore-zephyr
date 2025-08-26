@@ -279,6 +279,7 @@
 				    <&gpiof 9 GPIO_ACTIVE_HIGH>,
 				    <&gpiof 10 GPIO_ACTIVE_HIGH>,
 				    <&gpiog 13 GPIO_ACTIVE_HIGH>,       /* Internal SPI RDY */
+				    <&gpioa 2 GPIO_ACTIVE_HIGH>,        /* Analog switch for VREF */
 				    <&gpioh 3 GPIO_ACTIVE_HIGH>;        /* BOOT0 */
 
 		builtin-led-gpios = <&gpioh 10 GPIO_ACTIVE_HIGH>,
@@ -303,6 +304,7 @@
 		pwms = <>;
 
 		control-gpios = <&gpiog 13 GPIO_ACTIVE_HIGH>;    /* Internal SPI RDY */
+		analog-switch-gpios = <&gpioa 2 GPIO_ACTIVE_HIGH>;    /* Analog switch for VREF */
 
 		io-channels =	<&adc1 9>,
 				<&adc1 10>,

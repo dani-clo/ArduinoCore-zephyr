@@ -11,3 +11,11 @@
 #define SS      0
 #define SDA     0
 #define SCL     0
+
+#define AR_DEFAULT          0
+#define AR_INTERNAL2V5      1
+#define AR_INTERNAL2V05     2
+#define AR_INTERNAL1V5      3
+#define AR_INTERNAL1V8      4
+#define AR_EXTERNAL         5
+#define AR_INTERNAL         AR_INTERNAL2V5
