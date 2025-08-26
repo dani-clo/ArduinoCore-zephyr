@@ -37,6 +37,7 @@ unoq.upload.target=stm32u585zitxq
 
 unoq.upload.tool=remoteocd
 unoq.upload.tool.default=remoteocd
+unoq.upload.tool.network=remoteocd_network
 unoq.upload.protocol=
 unoq.upload.transport=
 unoq.upload.vid=0x2341
