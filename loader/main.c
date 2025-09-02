@@ -108,9 +108,9 @@ static int loader(const struct shell *sh)
 	void matrixGrayscaleWrite(uint8_t* buf);
 	#include "bootanimation.h"
 
-	uint8_t* _bootanimation = bootanimation;
+	uint8_t* _bootanimation = (uint8_t*)bootanimation;
 	size_t _bootanimation_len = bootanimation_len;
-	uint8_t* _bootanimation_end = bootanimation_end;
+	uint8_t* _bootanimation_end = (uint8_t*)bootanimation_end;
 	size_t _bootanimation_end_len = bootanimation_end_len;
 
 	__attribute__((packed)) struct bootanimation_user_data {
@@ -118,7 +118,7 @@ static int loader(const struct shell *sh)
 		size_t len_loop;
 		size_t len_end;
 		size_t empty;
-		char* buf_loop;
+		char buf_loop;
 	};
 
 	uintptr_t bootanimation_addr = DT_REG_ADDR(DT_GPARENT(DT_NODELABEL(bootanimation))) +
@@ -129,8 +129,7 @@ static int loader(const struct shell *sh)
 		_bootanimation = &(user_bootanimation->buf_loop);
 		_bootanimation_len = user_bootanimation->len_loop;
 		_bootanimation_end_len = user_bootanimation->len_end;
-		uint32_t tmp = user_bootanimation->buf_loop + user_bootanimation->len_loop;
-		_bootanimation_end = &tmp;
+		_bootanimation_end = _bootanimation + user_bootanimation->len_loop;
 	}
 
 	if ((!sketch_valid) || !(sketch_hdr->flags & SKETCH_FLAG_IMMEDIATE)) {
