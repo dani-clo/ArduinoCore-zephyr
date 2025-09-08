@@ -290,8 +290,6 @@
 				    <&gpiob 15 GPIO_ACTIVE_HIGH>, /* D11 - PB15 */
 				    <&gpiob 14 GPIO_ACTIVE_HIGH>, /* D12 - PB14 */
 				    <&gpiob 13 GPIO_ACTIVE_HIGH>, /* D13 - PB13 */
-				    <&gpiob 11 GPIO_ACTIVE_HIGH>, /* D20 - PB11 */
-				    <&gpiob 10 GPIO_ACTIVE_HIGH>, /* D21 - PB10 */
 
 					/* ADCs */
 				    <&gpioa 4 GPIO_ACTIVE_HIGH>, /* A0 - PA4 */
@@ -301,12 +299,12 @@
 				    <&gpioc 1 GPIO_ACTIVE_HIGH>, /* A4 - PC1 */
 				    <&gpioc 0 GPIO_ACTIVE_HIGH>, /* A5 - PC0 */
 
+				    <&gpiob 11 GPIO_ACTIVE_HIGH>,  /* D20 - PB11 */
+				    <&gpiob 10 GPIO_ACTIVE_HIGH>,  /* D21 - PB10 */
+
 				    <&gpioc 2 GPIO_ACTIVE_HIGH>,        /* JSPI */
 				    <&gpioc 3 GPIO_ACTIVE_HIGH>,
 				    <&gpiod 1 GPIO_ACTIVE_HIGH>,
-
-				    <&gpiob 11 GPIO_ACTIVE_HIGH>,       /* JDIGITAL SDA/SCL */
-				    <&gpiob 10 GPIO_ACTIVE_HIGH>,
 									
 				    <&gpioc 6 GPIO_ACTIVE_HIGH>,	/* JMISC */
 				    <&gpiod 2 GPIO_ACTIVE_HIGH>,
