@@ -24,7 +24,7 @@ unoq.compiler.zephyr.arch.define=
 unoq.build.float-abi=-mfloat-abi=hard
 unoq.build.extra_flags=
 unoq.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" exit
-unoq.build.board=unoq
+unoq.build.board=UNO_Q
 unoq.build.zephyr_hals=hal_stm32
 unoq.compiler.zephyr.arch.define=
 unoq.compiler.zephyr=
