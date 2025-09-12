@@ -3,7 +3,7 @@ menu.link_mode=Link mode
 
 ##########################################################################################
 
-unoq.name=Uno Q
+unoq.name=Arduino UNO Q
 unoq.build.core=arduino
 unoq.build.crossprefix=arm-zephyr-eabi-
 unoq.build.compiler_path={runtime.tools.arm-zephyr-eabi-0.16.8.path}/bin/
