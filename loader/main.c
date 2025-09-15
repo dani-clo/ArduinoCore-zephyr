@@ -139,11 +139,33 @@ static int loader(const struct shell *sh)
 
 		gpio_pin_configure_dt(&spec, GPIO_INPUT | GPIO_PULL_DOWN);
 		k_sleep(K_MSEC(200));
-		if (gpio_pin_get_dt(&spec) == 0) {
+		uint8_t* ram_firmware = NULL;
+		uint32_t *ram_start = (uint32_t *)0x20000000;
+		if (!sketch_valid) {
+			ram_firmware = (uint8_t*)k_malloc(64 * 1024);
+			if (!ram_firmware) {
+				printk("Failed to allocate RAM for firmware\n");
+				return -ENOMEM;
+			}
+			memset(ram_firmware, 0, 64 * 1024);
+			*ram_start = &ram_firmware[0];
+		}
+		if (gpio_pin_get_dt(&spec) == 0 || (ram_firmware != NULL)) {
 			matrixBegin();
 			matrixSetGrayscaleBits(8);
-			while (gpio_pin_get_dt(&spec) == 0) {
+			while (gpio_pin_get_dt(&spec) == 0 || (ram_firmware != NULL)) {
 				matrixPlay(_bootanimation, _bootanimation_len);
+				if (ram_firmware != NULL) {
+					printk("Trying to load firmware from RAM: %p\n", ram_firmware);
+					// poll the first bytes, if filled try to use them for booting
+					sketch_hdr = (struct sketch_header_v1 *)(ram_firmware + 7);
+					if (sketch_hdr->ver == 0x1 && sketch_hdr->magic == 0x2341) {
+						// Found valid data, use it for booting
+						base_addr = (uintptr_t)ram_firmware;
+						*ram_start = 0;
+						break;
+					}
+				}
 			}
 			matrixPlay(_bootanimation_end, _bootanimation_end_len);
 			uint8_t _framebuffer[104] = {0};
