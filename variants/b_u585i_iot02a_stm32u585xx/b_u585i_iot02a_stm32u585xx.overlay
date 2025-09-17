@@ -11,6 +11,40 @@
 		zephyr,bt-hci = &usart1; // TODO remove
 		zephyr,camera = &dcmi;
 	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led3_red: led3_red {
+			gpios = <&gpioh 10 GPIO_ACTIVE_LOW>;
+			label = "RGB LED 3 Red";
+		};
+
+		led3_green: led3_green {
+			gpios = <&gpioh 11 GPIO_ACTIVE_LOW>;
+			label = "RGB LED 3 Green";
+		};
+
+		led3_blue: led3_blue {
+			gpios = <&gpioh 12 GPIO_ACTIVE_LOW>;
+			label = "RGB LED 3 Blue";
+		};
+
+		led4_red: led4_red {
+			gpios = <&gpioh 13 GPIO_ACTIVE_LOW>;
+			label = "RGB LED 4 Red";
+		};
+
+		led4_green: led4_green {
+			gpios = <&gpioh 14 GPIO_ACTIVE_LOW>;
+			label = "RGB LED 4 Green";
+		};
+
+		led4_blue: led4_blue {
+			gpios = <&gpioh 15 GPIO_ACTIVE_LOW>;
+			label = "RGB LED 4 Blue";
+		};
+	};
 };
 
 
