@@ -37,6 +37,11 @@
 #undef DIGITAL_PIN_CHECK_UNIQUE
 #endif
 
+// Helper macro to get Arduino pin number from device tree alias
+#define DIGITAL_PIN_GPIOS_FIND_NODE(node)                                                          \
+    DIGITAL_PIN_GPIOS_FIND_PIN(DT_REG_ADDR(DT_PHANDLE_BY_IDX(node, gpios, 0)),                     \
+                               DT_PHA_BY_IDX(node, gpios, 0, pin))
+
 #ifndef LED_BUILTIN
 
 /* Return the index of it if matched, oterwise return 0 */
