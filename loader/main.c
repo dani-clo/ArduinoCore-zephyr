@@ -150,28 +150,28 @@ static int loader(const struct shell *sh)
 			memset(ram_firmware, 0, 64 * 1024);
 			*ram_start = &ram_firmware[0];
 		}
-		if (gpio_pin_get_dt(&spec) == 0 || (ram_firmware != NULL)) {
+		if (gpio_pin_get_dt(&spec) == 0) {
 			matrixBegin();
 			matrixSetGrayscaleBits(8);
-			while (gpio_pin_get_dt(&spec) == 0 || (ram_firmware != NULL)) {
+			while (gpio_pin_get_dt(&spec) == 0) {
 				matrixPlay(_bootanimation, _bootanimation_len);
-				if (ram_firmware != NULL) {
-					printk("Trying to load firmware from RAM: %p\n", ram_firmware);
-					// poll the first bytes, if filled try to use them for booting
-					sketch_hdr = (struct sketch_header_v1 *)(ram_firmware + 7);
-					if (sketch_hdr->ver == 0x1 && sketch_hdr->magic == 0x2341) {
-						// Found valid data, use it for booting
-						base_addr = (uintptr_t)ram_firmware;
-						*ram_start = 0;
-						break;
-					}
-				}
 			}
 			matrixPlay(_bootanimation_end, _bootanimation_end_len);
 			uint8_t _framebuffer[104] = {0};
 			matrixGrayscaleWrite(_framebuffer);
 			k_sleep(K_MSEC(10));
 			matrixEnd();
+		}
+		while (!sketch_valid) {
+			__asm__("bkpt");
+			// poll the first bytes, if filled try to use them for booting
+			sketch_hdr = (struct sketch_header_v1 *)(ram_firmware + 7);
+			if (sketch_hdr->ver == 0x1 && sketch_hdr->magic == 0x2341) {
+				// Found valid data, use it for booting
+				base_addr = (uintptr_t)ram_firmware;
+				*ram_start = 0;
+				sketch_valid = true;
+			}
 		}
 	}
 	#endif
