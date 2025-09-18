@@ -70,6 +70,13 @@
 */
 };
 
+&spi2 {
+	status = "okay";
+	pinctrl-0 = <&spi2_sck_pb13
+		     &spi2_miso_pb14 &spi2_mosi_pb15 &spi2_nss_pb9>;
+	pinctrl-names = "default";
+};
+
 &spi3 {
 	status = "okay";
 	pinctrl-0 = <&spi3_sck_pg9
@@ -389,7 +396,7 @@
 
 		serials = <&usart1>, <&lpuart1>;
 		i2cs = <&i2c2>, <&i2c4>;
-		spis = <&spi3>;
+		spis = <&spi2>, <&spi3>;
 		/* PWM mapping for the digital pins  */
 		/* Currently only the pins marked with ~ on the pin headers are enabled */
 		pwms = 
