@@ -237,3 +237,6 @@ private:
     bool _sequenceDone = false;
     voidFuncPtr _callBack;
 };
+
+// For backwards compatibility, also define the class name without underscores
+typedef Arduino_LED_Matrix ArduinoLEDMatrix;
