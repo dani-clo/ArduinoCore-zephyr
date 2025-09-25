@@ -1,6 +1,6 @@
-[submodule "libraries/Arduino_BridgeImola"]
-	path = libraries/Arduino_BridgeImola
-	url = git@github.com:bcmi-labs/Arduino_BridgeImola
+[submodule "libraries/Arduino_RouterBridge"]
+	path = libraries/Arduino_RouterBridge
+	url = git@github.com:bcmi-labs/Arduino_RouterBridge.git
 [submodule "libraries/Arduino_RPCLite"]
 	path = libraries/Arduino_RPCLite
-	url = git@github.com:bcmi-labs/Arduino_RPCLite
+	url = git@github.com:bcmi-labs/Arduino_RPClite.git
