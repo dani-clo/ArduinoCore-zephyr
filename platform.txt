@@ -269,12 +269,12 @@ tools.remoteocd.path={runtime.tools.remoteocd.path}
 tools.remoteocd.cmd=remoteocd
 tools.remoteocd.upload.params.verbose=--verbose
 tools.remoteocd.upload.params.quiet=--quite
-tools.remoteocd.upload.pattern="{path}/{cmd}" upload --adb-path "{runtime.tools.adb.path}/adb" -s "{upload.port.properties.serialNumber}" -f "{runtime.platform.path}/flash_sketch.cfg" "{build.path}/{build.project_name}.{upload.extension}"
+tools.remoteocd.upload.pattern="{path}/{cmd}" upload --adb-path "{runtime.tools.adb.path}/adb" -s "{upload.port.properties.serialNumber}" -f "{build.variant.path}/flash_sketch.cfg" "{build.path}/{build.project_name}.{upload.extension}" "{upload.verbose}" "{upload.quiet}"
 
 tools.remoteocd.bootloader.params.verbose=--verbose
 tools.remoteocd.bootloader.params.quiet=--quite
 tools.remoteocd.erase.pattern=
-tools.remoteocd.bootloader.pattern="{path}/{cmd}" upload --adb-path "{runtime.tools.adb.path}/adb" -s "{upload.port.properties.serialNumber}" -f "{runtime.platform.path}/flash_bootloader.cfg" "{runtime.platform.path}/firmwares/{bootloader.file}"
+tools.remoteocd.bootloader.pattern="{path}/{cmd}" upload --adb-path "{runtime.tools.adb.path}/adb" -s "{upload.port.properties.serialNumber}" -f "{build.variant.path}/flash_bootloader.cfg" "{runtime.platform.path}/firmwares/{bootloader.file}" "{upload.verbose}" "{upload.quiet}"
 
 tools.remoteocd_network.upload.protocol=network
 tools.remoteocd_network.upload.field.password=Password
@@ -283,7 +283,7 @@ tools.remoteocd_network.path={runtime.tools.remoteocd.path}
 tools.remoteocd_network.cmd=remoteocd
 tools.remoteocd_network.upload.params.verbose=--verbose
 tools.remoteocd_network.upload.params.quiet=--quite
-tools.remoteocd_network.upload.pattern="{path}/{cmd}" upload -a "{upload.port.address}" --password "{upload.field.password}" -f "{runtime.platform.path}/flash_sketch.cfg" "{build.path}/{build.project_name}.{upload.extension}"
+tools.remoteocd_network.upload.pattern="{path}/{cmd}" upload -a "{upload.port.address}" --password "{upload.field.password}" -f "{build.variant.path}/flash_sketch.cfg" "{build.path}/{build.project_name}.{upload.extension}" "{upload.verbose}" "{upload.quiet}"
 
 #
 # PYOCD WRAPPER
