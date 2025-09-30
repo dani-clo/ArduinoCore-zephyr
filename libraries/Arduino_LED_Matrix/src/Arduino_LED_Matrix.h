@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <cmsis_core.h>
 
 extern "C" {
   void matrixBegin(void);
@@ -14,14 +15,17 @@ extern "C" {
 #define MATRIX_WITH_ARDUINOGRAPHICS
 #endif
 
-static uint32_t reverse(uint32_t x)
-{
+static inline uint32_t reverse(uint32_t x) {
+#if defined(__CORTEX_M) && (__CORTEX_M >= 3U)
+    return __RBIT(x);
+#else
     x = ((x >> 1) & 0x55555555u) | ((x & 0x55555555u) << 1);
     x = ((x >> 2) & 0x33333333u) | ((x & 0x33333333u) << 2);
     x = ((x >> 4) & 0x0f0f0f0fu) | ((x & 0x0f0f0f0fu) << 4);
     x = ((x >> 8) & 0x00ff00ffu) | ((x & 0x00ff00ffu) << 8);
     x = ((x >> 16) & 0xffffu) | ((x & 0xffffu) << 16);
     return x;
+#endif
 }
 
 // TODO: this is dangerous, use with care
