@@ -231,7 +231,7 @@ jobs:
       CORE_ARTIFACT: ${{ needs.package-core.outputs.CORE_ARTIFACT }}
       ARTIFACT_FILE: ${{ needs.package-core.outputs.CORE_ARTIFACT }}.tar.bz2
       CORE_TAG: ${{ needs.package-core.outputs.CORE_TAG }}
-      PACKAGE_INDEX_JSON: zephyr-core-imola.json
+      PACKAGE_INDEX_JSON: zephyr-core-imola-test.json
     steps:
       - uses: actions/checkout@v4
         with:
