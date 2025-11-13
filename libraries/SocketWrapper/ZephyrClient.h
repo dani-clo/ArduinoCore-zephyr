@@ -17,11 +17,7 @@ private:
 
 protected:
 	void setSocket(int sock) {
-		if (sock_fd) {
-			*sock_fd = sock;
-		} else {
-			sock_fd = new int(sock);
-		}
+		sock_fd = std::shared_ptr<int>(sock < 0 ? nullptr : new int(sock), socket_deleter());
 		_connected = true;
 	}
 
