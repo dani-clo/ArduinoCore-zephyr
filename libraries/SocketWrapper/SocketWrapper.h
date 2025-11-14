@@ -68,20 +68,18 @@ protected:
 #endif
 
 	// custom deleter for shared_ptr to close automatically the socket
-	static auto socket_deleter() {
-		return [](int *fd) {
-			if (fd && *fd != -1) {
-				::close(*fd);
-				delete fd;
-			}
-		};
+	static void socket_deleter(int *fd) {
+		if (fd && *fd != -1) {
+			::close(*fd);
+		}
+		delete fd;
 	}
 
 public:
 	ZephyrSocketWrapper() = default;
 
 	ZephyrSocketWrapper(int fd)
-		: sock_fd(std::shared_ptr<int>(fd < 0 ? nullptr : new int(fd), socket_deleter())) {
+		: sock_fd(std::shared_ptr<int>(fd < 0 ? nullptr : new int(fd), socket_deleter)) {
 	}
 
 	~ZephyrSocketWrapper() = default; // socket close managed by shared_ptr
@@ -116,8 +114,8 @@ public:
 		}
 
 		raw_sock_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		sock_fd = std::shared_ptr<int>(raw_sock_fd < 0 ? nullptr : new int(raw_sock_fd),
-									   socket_deleter());
+		sock_fd =
+			std::shared_ptr<int>(raw_sock_fd < 0 ? nullptr : new int(raw_sock_fd), socket_deleter);
 		if (!sock_fd) {
 			rv = false;
 
@@ -150,8 +148,8 @@ public:
 		inet_pton(AF_INET, _host, &addr.sin_addr);
 
 		raw_sock_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		sock_fd = std::shared_ptr<int>(raw_sock_fd < 0 ? nullptr : new int(raw_sock_fd),
-									   socket_deleter());
+		sock_fd =
+			std::shared_ptr<int>(raw_sock_fd < 0 ? nullptr : new int(raw_sock_fd), socket_deleter);
 		if (!sock_fd) {
 			return false;
 		}
@@ -228,8 +226,8 @@ public:
 		}
 
 		raw_sock_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TLS_1_2);
-		sock_fd = std::shared_ptr<int>(raw_sock_fd < 0 ? nullptr : new int(raw_sock_fd),
-									   socket_deleter());
+		sock_fd =
+			std::shared_ptr<int>(raw_sock_fd < 0 ? nullptr : new int(raw_sock_fd), socket_deleter);
 		if (!sock_fd) {
 			goto exit;
 		}
@@ -321,8 +319,8 @@ public:
 		addr.sin_addr.s_addr = INADDR_ANY;
 
 		raw_sock_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		sock_fd = std::shared_ptr<int>(raw_sock_fd < 0 ? nullptr : new int(raw_sock_fd),
-									   socket_deleter());
+		sock_fd =
+			std::shared_ptr<int>(raw_sock_fd < 0 ? nullptr : new int(raw_sock_fd), socket_deleter);
 		if (!sock_fd) {
 			return false;
 		}
