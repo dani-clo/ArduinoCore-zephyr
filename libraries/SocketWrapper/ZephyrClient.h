@@ -104,7 +104,7 @@ public:
 	}
 
 	operator bool() {
-		return sock_fd && *sock_fd != -1;
+		return sock_fd;
 	}
 
 	String remoteIP() {
