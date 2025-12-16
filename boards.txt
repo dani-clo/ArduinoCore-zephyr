@@ -329,11 +329,11 @@ nicla_vision.menu.debug.false=Standard
 nicla_vision.menu.debug.true=Debug
 nicla_vision.menu.debug.true.build.zsk_args.debug=-debug
 
-nicla_vision.build.zephyr_target=nicla_vision@1.0.0//m7
+nicla_vision.build.zephyr_target=arduino_nicla_vision//m7
 nicla_vision.build.zephyr_args=
 nicla_vision.build.zephyr_hals=hal_stm32 hal_infineon
 nicla_vision.build.artifact=zephyr_main
-nicla_vision.build.variant=arduino_portenta_h7_stm32h747xx_m7
+nicla_vision.build.variant=arduino_nicla_vision_stm32h747xx_m7
 nicla_vision.build.mcu=cortex-m7
 nicla_vision.build.fpu=-mfpu=fpv5-d16
 nicla_vision.build.architecture=cortex-m7
@@ -342,7 +342,7 @@ nicla_vision.build.float-abi=-mfloat-abi=softfp
 nicla_vision.build.extra_flags=
 nicla_vision.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" exit
 nicla_vision.build.architecture=cortex-m7
-nicla_vision.build.board=PORTENTA_H7_M7
+nicla_vision.build.board=NICLA_VISION_H7_M7
 nicla_vision.vid.0=0x2341
 nicla_vision.pid.0=0x005b
 nicla_vision.upload_port.0.vid=0x2341
@@ -353,7 +353,7 @@ nicla_vision.upload.tool.default=dfu-util
 nicla_vision.upload.protocol=
 nicla_vision.upload.transport=
 nicla_vision.upload.vid=0x2341
-nicla_vision.upload.pid=0x025f
+nicla_vision.upload.pid=0x035f
 nicla_vision.upload.interface=0
 nicla_vision.upload.use_1200bps_touch=true
 nicla_vision.upload.wait_for_upload_port=true

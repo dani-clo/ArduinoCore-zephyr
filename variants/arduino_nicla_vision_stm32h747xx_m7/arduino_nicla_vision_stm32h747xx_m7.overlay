@@ -1,390 +1,267 @@
-&board_cdc_acm_uart {
-	status = "okay";
+&zephyr_udc0 {
+    board_cdc_acm_uart: board_cdc_acm_uart {
+        compatible = "zephyr,cdc-acm-uart";
+        status = "okay";
+    };
 };
 
 &usart1 {
-	status = "okay";
-};
-
-&uart4 {
-	status = "okay";
-};
-
-&usart6 {
-	status = "okay";
-};
-
-&i2c3 {
-	status = "okay";
-
-	gc2145: gc2145@3c {
-		compatible = "galaxycore,gc2145";
-		reg = <0x3c>;
-		status = "okay";
-
-		reset-gpios = <&gpioe 3 GPIO_ACTIVE_LOW>;
-		pwdn-gpios = <&gpiod 5 GPIO_ACTIVE_LOW>;
-
-		port {
-			gc2145_ep_out: endpoint {
-				remote-endpoint-label = "dcmi_ep_in";
-			};
-		};
-	};
-
-	ov7670: ov7670@21 {
-		compatible = "ovti,ov7670";
-		reg = <0x21>;
-
-		reset-gpios = <&gpioe 3 GPIO_ACTIVE_LOW>;
-		pwdn-gpios = <&gpiod 5 GPIO_ACTIVE_LOW>;
-
-		port {
-			ov7670_ep_out: endpoint {
-				remote-endpoint-label = "dcmi_ep_in";
-			};
-		};
-	};
+    status = "okay";
+    pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
+    pinctrl-names = "default";
+    current-speed = <115200>;
 };
 
 &i2c1 {
-	status = "okay";
+    status = "okay";
+    pinctrl-0 = <&i2c1_scl_pb8 &i2c1_sda_pb9>;
+    pinctrl-names = "default";
+    clock-frequency = <I2C_BITRATE_FAST>;
 };
 
-&i2c4 {
-	status = "okay";
+&i2c2 {
+    status = "okay";
+    pinctrl-0 = <&i2c2_scl_pf1 &i2c2_sda_pf0>;
+    pinctrl-names = "default";
+    clock-frequency = <I2C_BITRATE_FAST>;
 };
 
-&spi2 {
-	status = "okay";
-	pinctrl-0 = <&spi2_sck_pi1
-		     &spi2_miso_pc2 &spi2_mosi_pc3>;
-	pinctrl-names = "default";
+&i2c3 {
+    status = "okay";
+    pinctrl-0 = <&i2c3_scl_pa8 &i2c3_sda_pc9>;
+    pinctrl-names = "default";
+    clock-frequency = <I2C_BITRATE_FAST>;
 };
+
+&spi4 {
+    status = "okay";
+    pinctrl-0 = <&spi4_sck_pe12 &spi4_miso_pe13 &spi4_mosi_pe14 &spi4_nss_pe11>;
+    pinctrl-names = "default";
+};
+
+&spi5 {
+    status = "okay";
+    pinctrl-0 = <&spi5_sck_pf7 &spi5_miso_pf8 &spi5_mosi_pf11 &spi5_nss_pf6>;
+    pinctrl-names = "default";
+};
+
+/*
+&i2s3 {
+    status = "okay";
+    clocks = <&rcc 0xe8 0x8000>,
+             <&rcc 0x9 0x1cc0050>;
+    dma-names = "tx", "rx";
+    interrupts = <0x33 0x0>;
+
+    pinctrl-0 = <&i2s3_pins>;
+
+    pinctrl-names = "default";
+
+    i2s3_pins: i2s3-pins {
+        pinmux = <0x07>,  // Replace with the actual pinmux number for PA15 at some point (I2S3_WS)
+                 <0x08>,  // Replace with the actual pinmux number for PB2 at some point(I2S3_SD0)
+                 <0x09>,  // Replace with the actual pinmux number for PC10 at some point(I2S3_CK)
+                 <0x0A>;  // Replace with the actual pinmux number for PC11 at some point(I2S3_SD1)
+    };
+};
+*/
 
 &timers1 {
-	status = "okay";
-	st,prescaler = <0>;
+    status = "okay";
+    st,prescaler = <0>;
 
-	pwm1: pwm {
-		status = "okay";
-		pinctrl-0 = <&tim1_ch1_pa8 &tim1_ch2_pj11>;
-		pinctrl-names = "default";
-	};
+    pwm1: pwm {
+        status = "okay";
+        pinctrl-0 = <&tim1_ch3_pj9 &tim1_ch1_pk1>;
+        pinctrl-names = "default";
+    };
 };
 
 &timers3 {
-	status = "okay";
-	st,prescaler = <100>;
+    status = "okay";
+    st,prescaler = <100>;
 
-	pwm3: pwm {
-		status = "okay";
-		pinctrl-0 = <&tim3_ch1_pc6 &tim3_ch2_pc7>;
-		pinctrl-names = "default";
-	};
+    pwm3: pwm {
+        status = "okay";
+        pinctrl-0 = <&tim3_ch1_pc6 &tim3_ch2_pc7>;
+        pinctrl-names = "default";
+    };
 };
 
 &timers8 {
-	status = "okay";
-	st,prescaler = <100>;
+    status = "okay";
+    st,prescaler = <100>;
 
-	pwm8: pwm {
-		status = "okay";
-		pinctrl-0 = <&tim8_ch3n_ph15 &tim8_ch2_pj10 &tim8_ch2n_pj7>;
-		pinctrl-names = "default";
-	};
+    pwm8: pwm {
+        status = "okay";
+        pinctrl-0 = <&tim8_ch3n_ph15 &tim8_ch2_pj10 &tim8_ch2n_pj7>;
+        pinctrl-names = "default";
+    };
 };
 
 &timers12 {
-	status = "okay";
-	st,prescaler = <100>;
+    status = "okay";
+    st,prescaler = <100>;
 
-	pwm12: pwm {
-		status = "okay";
-		pinctrl-0 = <&tim12_ch1_ph6>;
-		pinctrl-names = "default";
-	};
+    pwm12: pwm {
+        status = "okay";
+        pinctrl-0 = <&tim12_ch1_ph6>;
+        pinctrl-names = "default";
+    };
 };
-
-&pwm1 {
-	/* Camera source clock */
-	pwmclock: pwmclock {
-		status = "okay";
-		compatible = "pwm-clock";
-		clock-frequency = <0>;
-		#clock-cells = <1>;
-		pwms = <&pwm1 1 PWM_HZ(12000000) PWM_POLARITY_NORMAL>;
-		/* 12MHz for 7670, default is also 12MHz */
-	};
-};
-
-&rng {
-	status = "okay";
-};
-
-&dmamux1 {
-	status = "okay";
-};
-
-&dma1 {
-	status = "okay";
-};
-
-&dcmi {
-	status = "okay";
-	/* ext-sdram = <&sdram1>; */
-	pinctrl-0 = <&dcmi_hsync_pa4 &dcmi_pixclk_pa6 &dcmi_vsync_pi5
-		     &dcmi_d0_ph9 &dcmi_d1_ph10 &dcmi_d2_ph11 &dcmi_d3_ph12
-		     &dcmi_d4_ph14 &dcmi_d5_pi4 &dcmi_d6_pi6 &dcmi_d7_pi7>;
-	pinctrl-names = "default";
-	dmas = <&dma1 0 75 (STM32_DMA_PERIPH_TO_MEMORY | STM32_DMA_PERIPH_NO_INC |
-			    STM32_DMA_MEM_INC | STM32_DMA_PERIPH_32BITS | STM32_DMA_MEM_32BITS |
-			    STM32_DMA_PRIORITY_HIGH) STM32_DMA_FIFO_FULL>; //FULL for 7670, default FIFO_1_4
-
-	port {
-		dcmi_ep_in: endpoint {
-			remote-endpoint-label = "gc2145_ep_out";
-			// remote-endpoint-label = "ov7670_ep_out";
-			bus-width = <8>;
-			hsync-active = <0>;
-			vsync-active = <0>;
-			pclk-sample = <0>;
-		};
-	};
-};
-
 
 &adc1 {
-	pinctrl-0 = <&adc1_inp12_pc2
-      		     &adc1_inp13_pc3
-      		     &adc1_inp18_pa4
-      		     &adc1_inp3_pa6
-      		     &adc1_inp0_pa0_c
-      		     &adc1_inp1_pa1_c>;
-	pinctrl-names = "default";
-	st,adc-clock-source = "SYNC";
-	st,adc-prescaler = <4>;
-	status = "okay";
+    pinctrl-0 = <&adc1_inp4_pc4 &adc1_inp5_pb1 &adc1_inp12_pc2 &adc1_inp13_pc3>;
+    pinctrl-names = "default";
+    st,adc-clock-source = "SYNC";
+    st,adc-prescaler = <4>;
+    status = "okay";
 
-	#address-cells = <1>;
-	#size-cells = <0>;
+    #address-cells = <1>;
+    #size-cells = <0>;
 
-	channel@c {
-		reg = <12>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
-		zephyr,resolution = <16>;
-	};
-	channel@d {
-		reg = <13>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
-		zephyr,resolution = <16>;
-	};
-	channel@12 {
-		reg = <18>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
-		zephyr,resolution = <16>;
-	};
-	channel@3 {
-		reg = <3>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
-		zephyr,resolution = <16>;
-	};
+    channel@4 {
+        reg = <4>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
+        zephyr,resolution = <16>;
+    };
 
-	/* PA0_C and PA1_C */
-	channel@0 {
-		reg = <0>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
-		zephyr,resolution = <16>;
-	};
-	channel@1 {
-		reg = <1>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
-		zephyr,resolution = <16>;
-	};
+    channel@12 {
+        reg = <12>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
+        zephyr,resolution = <16>;
+    };
 };
 
 &adc3 {
-	pinctrl-0 = <&adc3_inp0_pc2_c
-		     &adc3_inp1_pc3_c>;
-	pinctrl-names = "default";
-	st,adc-clock-source = "SYNC";
-	st,adc-prescaler = <4>;
-	status = "okay";
+    pinctrl-0 = <&adc3_inp0_pc2_c &adc3_inp1_pc3_c>;
+    pinctrl-names = "default";
+    st,adc-clock-source = "SYNC";
+    st,adc-prescaler = <4>;
+    status = "okay";
 
-	#address-cells = <1>;
-	#size-cells = <0>;
+    #address-cells = <1>;
+    #size-cells = <0>;
 
-	channel@0 {
-		reg = <0>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
-		zephyr,resolution = <16>;
-	};
-	channel@1 {
-		reg = <1>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
-		zephyr,resolution = <16>;
-	};
+    channel@0 {
+        reg = <0>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
+        zephyr,resolution = <16>;
+    };
+    channel@1 {
+        reg = <1>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
+        zephyr,resolution = <16>;
+    };
 };
 
 / {
-	chosen {
-		zephyr,camera = &dcmi;
-		zephyr,console = &usart6;
-		zephyr,shell-uart = &usart6;
-		zephyr,cdc-acm-uart0 = &usart6;
-	};
+    chosen {
+        zephyr,console = &board_cdc_acm_uart;
+        /*zephyr,console = &usart1;*/
+        zephyr,shell-uart = &usart1;
+        /*zephyr,cdc-acm-uart0 = &usart1;*/
+    };
 
-	/* used to overcome problems with _C analog pins */
-	gpioz: gpio@deadbeef {
-		compatible = "vnd,gpio";
-		gpio-controller;
-		reg = <0xdeadbeef 0x1000>;
-		#gpio-cells = <0x2>;
-		status = "okay";
-	};
+    
+    gpioz: gpio@deadbeef {
+        compatible = "vnd,gpio";
+        gpio-controller;
+        reg = <0xdeadbeef 0x1000>;
+        #gpio-cells = <0x2>;
+        status = "okay";
+    };
 };
 
 / {
-	soc {
-		flash-controller@52002000 {
-			flash0: flash@8000000 {
-				/delete-node/ partitions;
-				compatible = "st,stm32-nv-flash", "soc-nv-flash";
-				write-block-size = <32>;
-				erase-block-size = <DT_SIZE_K(128)>;
-				/* maximum erase time for a 128K sector */
-				max-erase-time = <4000>;
+    soc {
+        flash-controller@52002000 {
+            flash0: flash@8000000 {
+                /delete-node/ partitions;
+                compatible = "st,stm32-nv-flash", "soc-nv-flash";
+                write-block-size = <32>;
+                erase-block-size = <DT_SIZE_K(128)>;
+                /* maximum erase time for a 128K sector */
+                max-erase-time = <4000>;
 
-				reg = <0x08000000 DT_SIZE_K(1024)>;
-				status = "okay";
+                reg = <0x08000000 DT_SIZE_K(1024)>;
+                status = "okay";
 
-				partitions {
-					compatible = "fixed-partitions";
-					#address-cells = <1>;
-					#size-cells = <1>;
+                partitions {
+                    compatible = "fixed-partitions";
+                    #address-cells = <1>;
+                    #size-cells = <1>;
 
-					boot_partition: partition@0 {
-							label = "mcuboot";
-							reg = <0x00000000 0x00040000>;
-							read-only;
-					};
+                    boot_partition: partition@0 {
+                            label = "mcuboot";
+                            reg = <0x00000000 0x00040000>;
+                            read-only;
+                    };
 
-					slot0_partition: partition@40000 {
-							label = "image-0";
-							reg = <0x00040000 0x000A0000>;
-					};
+                    slot0_partition: partition@40000 {
+                            label = "image-0";
+                            reg = <0x00040000 0x000A0000>;
+                    };
 
-					user_sketch: partition@e0000 {
-						reg = <0x0E0000 0x20000>;
-					};
-				};
-			};
-		};
-	};
+                    user_sketch: partition@e0000 {
+                        reg = <0x0E0000 0x20000>;
+                    };
+                };
+            };
+        };
+
+        ram@20000000 {
+            reg = <0x20000000 0x20000>;  /* SRAM1, 128KB */
+            compatible = "st,stm32h747-sram";
+            status = "okay";
+        };
+    };
+
+
+    zephyr,user {
+        digital-pin-gpios = <&gpiof 4 0>,    /* Blue LED PF_4 */
+                            <&gpioc 13 0>,   /* Green LED PC_13 */
+                            <&gpioe 3 0>;    /* Red LED PE_3 */
+
+        adc-pin-gpios = <&gpioc 4 0>,  /* A0 PC_4 */
+                        <&gpiof 13 0>, /* A1 PF_13 */
+                        <&gpiof 3 0>;  /* A2 PF_3 */
+
+        pwm-pin-gpios = <&gpioa 8 0>,
+                        <&gpioc 6 0>,
+                        <&gpioc 7 0>,
+                        <&gpioh 15 0>,
+                        <&gpioj 7 0>,
+                        <&gpioj 10 0>,
+                        <&gpioh 6 0>;
+
+        serials = <&board_cdc_acm_uart>, <&usart1>;
+        cdc-acm = <&board_cdc_acm_uart>;
+
+        i2cs = <&i2c3>, <&i2c1>;
+
+        io-channels = <&adc1 0>,
+                      <&adc3 0>,
+                      <&adc1 6>;
+
+        builtin-led-gpios = <&gpiof 4 0>,
+                            <&gpioc 13 0>,
+                            <&gpioe 3 0>;
+
+        pwms =  <&pwm1 3 PWM_HZ(12000000) PWM_POLARITY_NORMAL>,
+                <&pwm3 3 PWM_HZ(12000000) PWM_POLARITY_NORMAL>,
+                <&pwm8 3 PWM_HZ(12000000) PWM_POLARITY_NORMAL>;
+    };
 };
-
 
 /* Include common flash filesystem configuration */
-qspi_flash: &mx25l12833f {};
+qspi_flash: &n25q128a1 {};
 #include "../common/arduino_flash_fs.dtsi"
-
-/ {
-	zephyr,user {
-		digital-pin-gpios = <&gpioh 15 0>,	/* D0 */
-				    <&gpiok 1 0>,		/* D1 */
-				    <&gpioj 11 0>,	/* D2 */
-				    <&gpiog 7 0>,		/* D3 */
-				    <&gpioc 7 0>,		/* D4 */
-				    <&gpioc 6 0>,		/* D5 */
-				    <&gpioa 8 0>,		/* D6 */
-				    <&gpioi 0 0>,		/* D7 */
-				    <&gpioc 3 0>,		/* D8 */
-				    <&gpioi 1 0>,		/* D9 */
-				    <&gpioc 2 0>,		/* D10 */
-				    <&gpioh 8 0>,		/* D11 */
-				    <&gpioh 7 0>,		/* D12 */
-				    <&gpioa 10 0>,	/* D13 */
-				    <&gpioa 9 0>,		/* D14 */
-
-				    <&gpioz 0 0>,		/* A0	 ADC2_INP0 */
-				    <&gpioz 1 0>,		/* A1	 ADC2_INP1 */
-				    <&gpioz 2 0>,		/* A2	 ADC3_INP0 */
-				    <&gpioz 3 0>,		/* A3	 ADC3_INP1 */
-				    <&gpioz 4 0>,		/* A4 hack for duplicate PC_2 */
-				    <&gpioz 5 0>,		/* A5 hack for duplicate PC_3 */
-				    /* <&gpioc 2 0>,	A4 _ALT0?   ADC1_INP12 */
-				    /* <&gpioc 3 0>,	A5 _ALT0?   ADC1_INP13 */
-				    <&gpioa 4 0>,		/* A6	 ADC1_INP18 */
-				    <&gpioa 6 0>,		/* A7	 ADC1_INP7 */
-
-				    <&gpiok 5 0>,		/* LEDR */
-				    <&gpiok 6 0>,		/* LEDG */
-				    <&gpiok 7 0>;		/* LEDB */
-
-		builtin-led-gpios = <&gpiok 5 0>,
-				    <&gpiok 6 0>,
-				    <&gpiok 7 0>;
-
-		pwm-pin-gpios =	<&gpioa 8 0>,
-				<&gpioc 6 0>,
-				<&gpioc 7 0>,
-				//<&gpiog 7 0>,
-				<&gpioj 11 0>,
-				//<&gpiok 1 0>,
-				<&gpioh 15 0>,
-				<&gpioj 7 0>,
-				<&gpioj 10 0>,
-				<&gpioh 6 0>;
-
-		adc-pin-gpios =	<&gpioz 0 0>,			/* analog only */
-				<&gpioz 1 0>,			/* analog only */
-				<&gpioz 2 0>,			/* analog only */
-				<&gpioz 3 0>,			/* analog only */
-				<&gpioc 2 0>,
-				<&gpioc 3 0>,
-				<&gpioa 4 0>,
-				<&gpioa 6 0>,
-				<&gpioz 4 0>,			/* Hack for D19  */
-				<&gpioz 5 0>;			/* Hack for D20 */
-
-		serials = <&board_cdc_acm_uart>,<&usart6>, <&usart1>, <&uart4>;
-		cdc-acm = <&board_cdc_acm_uart>;
-		i2cs = <&i2c3>, <&i2c1>, <&i2c4>;
-		spis = <&spi2>;
-		pwms = <&pwm1 1 PWM_HZ(12000000) PWM_POLARITY_NORMAL>,	/* Camera */
-		       <&pwm3 1 PWM_HZ(500) PWM_POLARITY_NORMAL>,
-		       <&pwm3 2 PWM_HZ(500) PWM_POLARITY_NORMAL>,
-		       <&pwm1 2 PWM_HZ(5000) PWM_POLARITY_NORMAL>,
-		       <&pwm8 3 PWM_HZ(500) PWM_POLARITY_INVERTED>,
-		       <&pwm8 2 PWM_HZ(500) PWM_POLARITY_INVERTED>,
-		       <&pwm8 2 PWM_HZ(500) PWM_POLARITY_NORMAL>,
-		       <&pwm12 1 PWM_HZ(500) PWM_POLARITY_NORMAL>;
-
-		io-channels = <&adc1 0>,
-			      <&adc1 1>,
-			      <&adc3 0>,
-			      <&adc3 1>,
-			      <&adc1 12>,
-			      <&adc1 13>,
-			      <&adc1 18>,
-			      <&adc1 3>,
-			      <&adc1 12>, /* Hack for D19 */
-			      <&adc1 13>; /* Hack for D20 */
-	};
-};
