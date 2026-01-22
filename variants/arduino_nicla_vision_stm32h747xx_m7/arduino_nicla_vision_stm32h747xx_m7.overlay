@@ -227,9 +227,9 @@
 
 
     zephyr,user {
-        digital-pin-gpios = <&gpiof 4 0>,    /* Blue LED PF_4 */
+        digital-pin-gpios = <&gpioe 3 0>,    /* Red LED PE_3 */
                             <&gpioc 13 0>,   /* Green LED PC_13 */
-                            <&gpioe 3 0>;    /* Red LED PE_3 */
+                            <&gpiof 4 0>;    /* Blue LED PF_4 */
 
         adc-pin-gpios = <&gpioc 4 0>,  /* A0 PC_4 */
                         <&gpiof 13 0>, /* A1 PF_13 */
@@ -252,9 +252,10 @@
                       <&adc3 0>,
                       <&adc1 6>;
 
-        builtin-led-gpios = <&gpiof 4 0>,
-                            <&gpioc 13 0>,
-                            <&gpioe 3 0>;
+        builtin-led-gpios = <&gpioc 13 0>, /* Green LED PC_13 */  /* LED_BUILTIN macro is defined as first builtin-led-gpios */
+                            <&gpioe 3 0>,  /* Red LED PE_3 */
+                            <&gpioc 13 0>, /* Green LED PC_13 */ 
+                            <&gpiof 4 0>;  /* Blue LED PF_4 */                 
 
         pwms =  <&pwm1 3 PWM_HZ(12000000) PWM_POLARITY_NORMAL>,
                 <&pwm3 3 PWM_HZ(12000000) PWM_POLARITY_NORMAL>,

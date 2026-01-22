@@ -9,12 +9,15 @@ void _on_1200_bps() {
 }
 
 void initVariant(void) {
-    // check the BLUE LED
-    /* Set led1 inactive since the Arduino bootloader leaves it active */
+    /* Set leds inactive since the Arduino bootloader leaves it active */
+    const struct gpio_dt_spec led0 = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
+    const struct gpio_dt_spec led1 = GPIO_DT_SPEC_GET(DT_ALIAS(led1), gpios);
     const struct gpio_dt_spec led2 = GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios);
-    if (!gpio_is_ready_dt(&led2)) {
+    if (!gpio_is_ready_dt(&led0) || !gpio_is_ready_dt(&led1) || !gpio_is_ready_dt(&led2)) {
         return;
     }
 
+    gpio_pin_configure_dt(&led0, GPIO_OUTPUT_INACTIVE);
+    gpio_pin_configure_dt(&led1, GPIO_OUTPUT_INACTIVE);
     gpio_pin_configure_dt(&led2, GPIO_OUTPUT_INACTIVE);
 }
