@@ -34,14 +34,14 @@
 };
 
 &spi4 {
-    status = "okay";
-    pinctrl-0 = <&spi4_sck_pe12 &spi4_miso_pe13 &spi4_mosi_pe14 &spi4_nss_pe11>;
-    pinctrl-names = "default";
+	status = "okay";
+	pinctrl-0 = <&spi4_nss_pe11 &spi4_sck_pe12 &spi4_miso_pe13 &spi4_mosi_pe14>;
+	pinctrl-names = "default";
 };
 
 &spi5 {
     status = "okay";
-    pinctrl-0 = <&spi5_sck_pf7 &spi5_miso_pf8 &spi5_mosi_pf11 &spi5_nss_pf6>;
+    pinctrl-0 = <&spi5_nss_pf6 &spi5_sck_pf7 &spi5_miso_pf8 &spi5_mosi_pf11>;
     pinctrl-names = "default";
 };
 
@@ -227,7 +227,11 @@
 
 
     zephyr,user {
-        digital-pin-gpios = <&gpioe 3 0>,    /* Red LED PE_3 */
+        digital-pin-gpios = <&gpiog 12 0>,   /* D0 PG_12 */
+                            <&gpioa 9 0>,    /* D1 PA_9 */
+                            <&gpioa 10 0>,   /* D2 PA_10 */
+                            <&gpiog 1 0>,    /* D3 PG_1 */
+                            <&gpioe 3 0>,    /* Red LED PE_3 */
                             <&gpioc 13 0>,   /* Green LED PC_13 */
                             <&gpiof 4 0>;    /* Blue LED PF_4 */
 
@@ -246,7 +250,8 @@
         serials = <&board_cdc_acm_uart>, <&usart1>;
         cdc-acm = <&board_cdc_acm_uart>;
 
-        i2cs = <&i2c3>, <&i2c1>;
+        i2cs = <&i2c1>, <&i2c2>, <&i2c3>;
+        spis = <&spi4>;
 
         io-channels = <&adc1 0>,
                       <&adc3 0>,
