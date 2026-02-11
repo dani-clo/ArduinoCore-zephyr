@@ -1,3 +1,9 @@
+/*
+ * Arduino Nicla Vision Overlay
+ * Configures peripherals for Arduino Core compatibility
+ */
+
+/* USB CDC-ACM UART for console */
 &zephyr_udc0 {
     board_cdc_acm_uart: board_cdc_acm_uart {
         compatible = "zephyr,cdc-acm-uart";
@@ -5,67 +11,29 @@
     };
 };
 
-&usart1 {
-    status = "okay";
-    pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
-    pinctrl-names = "default";
-    current-speed = <115200>;
-};
-
+/* I2C buses */
 &i2c1 {
     status = "okay";
-    pinctrl-0 = <&i2c1_scl_pb8 &i2c1_sda_pb9>;
-    pinctrl-names = "default";
-    clock-frequency = <I2C_BITRATE_FAST>;
 };
 
 &i2c2 {
     status = "okay";
-    pinctrl-0 = <&i2c2_scl_pf1 &i2c2_sda_pf0>;
-    pinctrl-names = "default";
-    clock-frequency = <I2C_BITRATE_FAST>;
 };
 
 &i2c3 {
     status = "okay";
-    pinctrl-0 = <&i2c3_scl_pa8 &i2c3_sda_pc9>;
-    pinctrl-names = "default";
-    clock-frequency = <I2C_BITRATE_FAST>;
 };
 
+/* SPI buses */
 &spi4 {
-	status = "okay";
-	pinctrl-0 = <&spi4_nss_pe11 &spi4_sck_pe12 &spi4_miso_pe13 &spi4_mosi_pe14>;
-	pinctrl-names = "default";
+    status = "okay";
 };
 
 &spi5 {
     status = "okay";
-    pinctrl-0 = <&spi5_nss_pf6 &spi5_sck_pf7 &spi5_miso_pf8 &spi5_mosi_pf11>;
-    pinctrl-names = "default";
 };
 
-/*
-&i2s3 {
-    status = "okay";
-    clocks = <&rcc 0xe8 0x8000>,
-             <&rcc 0x9 0x1cc0050>;
-    dma-names = "tx", "rx";
-    interrupts = <0x33 0x0>;
-
-    pinctrl-0 = <&i2s3_pins>;
-
-    pinctrl-names = "default";
-
-    i2s3_pins: i2s3-pins {
-        pinmux = <0x07>,  // Replace with the actual pinmux number for PA15 at some point (I2S3_WS)
-                 <0x08>,  // Replace with the actual pinmux number for PB2 at some point(I2S3_SD0)
-                 <0x09>,  // Replace with the actual pinmux number for PC10 at some point(I2S3_CK)
-                 <0x0A>;  // Replace with the actual pinmux number for PC11 at some point(I2S3_SD1)
-    };
-};
-*/
-
+/* PWM Timers */
 &timers1 {
     status = "okay";
     st,prescaler = <0>;
@@ -77,16 +45,7 @@
     };
 };
 
-&timers3 {
-    status = "okay";
-    st,prescaler = <100>;
-
-    pwm3: pwm {
-        status = "okay";
-        pinctrl-0 = <&tim3_ch1_pc6 &tim3_ch2_pc7>;
-        pinctrl-names = "default";
-    };
-};
+/* Note: timers3 is configured for camera clock generation in base .dts */
 
 &timers8 {
     status = "okay";
@@ -166,12 +125,10 @@
 / {
     chosen {
         zephyr,console = &board_cdc_acm_uart;
-        /*zephyr,console = &usart1;*/
         zephyr,shell-uart = &usart1;
-        /*zephyr,cdc-acm-uart0 = &usart1;*/
     };
 
-    
+    /* used to overcome problems with _C analog pins */
     gpioz: gpio@deadbeef {
         compatible = "vnd,gpio";
         gpio-controller;
@@ -181,6 +138,14 @@
     };
 };
 
+/*
+ * Flash Partition Layout Override
+ * Custom partition layout for Arduino Core compatibility:
+ * - mcuboot: 256KB bootloader
+ * - image-0: 640KB loader slot
+ * - user_sketch: 128KB user data
+ * Total: 1MB internal flash
+ */
 / {
     soc {
         flash-controller@52002000 {
@@ -217,54 +182,49 @@
                 };
             };
         };
-
-        ram@20000000 {
-            reg = <0x20000000 0x20000>;  /* SRAM1, 128KB */
-            compatible = "st,stm32h747-sram";
-            status = "okay";
-        };
     };
 
-
     zephyr,user {
-        digital-pin-gpios = <&gpiog 12 0>,   /* D0 PG_12 */
-                            <&gpioa 9 0>,    /* D1 PA_9 */
-                            <&gpioa 10 0>,   /* D2 PA_10 */
-                            <&gpiog 1 0>,    /* D3 PG_1 */
-                            <&gpioe 3 0>,    /* Red LED PE_3 */
-                            <&gpioc 13 0>,   /* Green LED PC_13 */
-                            <&gpiof 4 0>;    /* Blue LED PF_4 */
+        digital-pin-gpios = <&gpiog 12 GPIO_ACTIVE_HIGH>,   /* D0 PG_12 */
+                            <&gpioa 9 GPIO_ACTIVE_HIGH>,    /* D1 PA_9 */
+                            <&gpioa 10 GPIO_ACTIVE_HIGH>,   /* D2 PA_10 */
+                            <&gpiog 1 GPIO_ACTIVE_HIGH>,    /* D3 PG_1 */
+                            <&gpioe 3 GPIO_ACTIVE_HIGH>,    /* Red LED PE_3 */
+                            <&gpioc 13 GPIO_ACTIVE_HIGH>,   /* Green LED PC_13 */
+                            <&gpiof 4 GPIO_ACTIVE_HIGH>;    /* Blue LED PF_4 */
 
-        adc-pin-gpios = <&gpioc 4 0>,  /* A0 PC_4 */
-                        <&gpiof 13 0>, /* A1 PF_13 */
-                        <&gpiof 3 0>;  /* A2 PF_3 */
+        adc-pin-gpios = <&gpioc 4 GPIO_ACTIVE_HIGH>,  /* A0 PC_4 */
+                        <&gpiof 13 GPIO_ACTIVE_HIGH>, /* A1 PF_13 */
+                        <&gpiof 3 GPIO_ACTIVE_HIGH>;  /* A2 PF_3 */
 
-        pwm-pin-gpios = <&gpioa 8 0>,
-                        <&gpioc 6 0>,
-                        <&gpioc 7 0>,
-                        <&gpioh 15 0>,
-                        <&gpioj 7 0>,
-                        <&gpioj 10 0>,
-                        <&gpioh 6 0>;
+        pwm-pin-gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>,
+                        <&gpioc 6 GPIO_ACTIVE_HIGH>,
+                        <&gpioc 7 GPIO_ACTIVE_HIGH>,
+                        <&gpioh 15 GPIO_ACTIVE_HIGH>,
+                        <&gpioj 7 GPIO_ACTIVE_HIGH>,
+                        <&gpioj 10 GPIO_ACTIVE_HIGH>,
+                        <&gpioh 6 GPIO_ACTIVE_HIGH>;
 
         serials = <&board_cdc_acm_uart>, <&usart1>;
         cdc-acm = <&board_cdc_acm_uart>;
 
         i2cs = <&i2c1>, <&i2c2>, <&i2c3>;
-        spis = <&spi4>;
+        spis = <&spi4>, <&spi5>;
 
         io-channels = <&adc1 0>,
                       <&adc3 0>,
                       <&adc1 6>;
 
-        builtin-led-gpios = <&gpioc 13 0>, /* Green LED PC_13 */  /* LED_BUILTIN macro is defined as first builtin-led-gpios */
-                            <&gpioe 3 0>,  /* Red LED PE_3 */
-                            <&gpioc 13 0>, /* Green LED PC_13 */ 
-                            <&gpiof 4 0>;  /* Blue LED PF_4 */                 
+        builtin-led-gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>, /* Green LED PC_13 (LED_BUILTIN) */
+                            <&gpioe 3 GPIO_ACTIVE_HIGH>,  /* Red LED PE_3 */
+                            <&gpiof 4 GPIO_ACTIVE_HIGH>;  /* Blue LED PF_4 */
 
-        pwms =  <&pwm1 3 PWM_HZ(12000000) PWM_POLARITY_NORMAL>,
-                <&pwm3 3 PWM_HZ(12000000) PWM_POLARITY_NORMAL>,
-                <&pwm8 3 PWM_HZ(12000000) PWM_POLARITY_NORMAL>;
+        /* PWM channels: timers1(ch1,ch3), timers8(ch2,ch2n,ch3n), timers12(ch1) */
+        pwms =  <&pwm1 1 PWM_HZ(1000) PWM_POLARITY_NORMAL>,
+                <&pwm1 3 PWM_HZ(1000) PWM_POLARITY_NORMAL>,
+                <&pwm8 2 PWM_HZ(1000) PWM_POLARITY_NORMAL>,
+                <&pwm8 3 PWM_HZ(1000) PWM_POLARITY_NORMAL>,
+                <&pwm12 1 PWM_HZ(1000) PWM_POLARITY_NORMAL>;
     };
 };
 
