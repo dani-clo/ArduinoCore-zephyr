@@ -329,6 +329,11 @@ nicla_vision.menu.debug.false=Standard
 nicla_vision.menu.debug.true=Debug
 nicla_vision.menu.debug.true.build.zsk_args.debug=-debug
 
+nicla_vision.menu.link_mode.dynamic=Dynamic
+nicla_vision.menu.link_mode.static=Static
+nicla_vision.menu.link_mode.static.build.link_mode=static
+nicla_vision.menu.link_mode.static.upload.extension=bin-zsk.bin
+
 nicla_vision.build.zephyr_target=arduino_nicla_vision//m7
 nicla_vision.build.zephyr_args=
 nicla_vision.build.zephyr_hals=hal_stm32 hal_infineon
