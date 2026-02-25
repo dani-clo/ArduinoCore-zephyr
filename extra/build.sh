@@ -116,3 +116,7 @@ extra/gen_provides.py "${BUILD_DIR}/zephyr/zephyr.elf" -LF \
 	"random=__wrap_random" > ${VARIANT_DIR}/syms-static.ld
 
 cmake -P extra/gen_arduino_files.cmake $variant
+
+echo "Build complete for $variant! Generating RAM usage report..."
+
+west build -t ram_report -d ${BUILD_DIR} -b ${target}

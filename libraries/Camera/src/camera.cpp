@@ -100,26 +100,31 @@ bool Camera::begin(uint32_t width, uint32_t height, uint32_t pixformat, bool byt
 	};
 
 	if (video_set_format(this->vdev, &fmt)) {
-		Serial.println("Failed to set video format");
+		printk("Failed to set video format\n");
 		return false;
 	}
+	
+	printk("Going to allocate %d buffers of size %d\n", ARRAY_SIZE(this->vbuf), fmt.pitch * fmt.height);
 
 	// Allocate video buffers.
 	for (size_t i = 0; i < ARRAY_SIZE(this->vbuf); i++) {
 		this->vbuf[i] = video_buffer_aligned_alloc(fmt.pitch * fmt.height,
-												   CONFIG_VIDEO_BUFFER_POOL_ALIGN, K_FOREVER);
+												   CONFIG_VIDEO_BUFFER_POOL_ALIGN, K_SECONDS(3));
 		if (this->vbuf[i] == NULL) {
-			Serial.println("Failed to allocate video buffers");
+			printk("Failed to allocate video buffers\n");
 			return false;
 		}
+		printk("Allocated video buffer %d: %p\n", i, this->vbuf[i]->buffer);
 		video_enqueue(this->vdev, this->vbuf[i]);
 	}
 
 	// Start video capture
 	if (video_stream_start(this->vdev, VIDEO_BUF_TYPE_OUTPUT)) {
-		Serial.println("Failed to start capture");
+		printk("Failed to start capture\n");
 		return false;
 	}
+
+	printk("Camera initialized successfully\n");
 
 	return true;
 }
