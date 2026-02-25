@@ -33,6 +33,13 @@
     status = "okay";
 };
 
+&rtc {
+    status = "okay";
+
+    clocks = <&rcc STM32_CLOCK(APB4, 16U)>,
+             <&rcc STM32_SRC_LSE RTC_SEL(1)>;
+};
+
 /* PWM Timers */
 &timers1 {
     status = "okay";
