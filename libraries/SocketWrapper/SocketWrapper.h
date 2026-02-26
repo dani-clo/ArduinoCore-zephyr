@@ -17,8 +17,8 @@
 #endif
 
 #include <zephyr/net/socket.h>
-#include <memory>
-#include <cstring>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 class ZephyrSocketWrapper {
 protected:
@@ -70,10 +70,16 @@ protected:
 	}
 #endif
 
-	// custom deleter for shared_ptr to close automatically the socket
-	static void socket_deleter(int *fd) {
-		if (fd && *fd != -1) {
-			::close(*fd);
+public:
+	ZephyrSocketWrapper() : sock_fd(-1) {
+	}
+
+	ZephyrSocketWrapper(int sock_fd) : sock_fd(sock_fd) {
+	}
+
+	~ZephyrSocketWrapper() {
+		if (sock_fd != -1) {
+			zsock_close(sock_fd);
 		}
 		delete fd;
 	}
@@ -125,8 +131,9 @@ public:
 			goto exit;
 		}
 
-		if (::connect(*sock_fd, res->ai_addr, res->ai_addrlen) < 0) {
-			sock_fd = nullptr;
+		if (::connect(sock_fd, res->ai_addr, res->ai_addrlen) < 0) {
+			zsock_close(sock_fd);
+			sock_fd = -1;
 			rv = false;
 			goto exit;
 		}
@@ -157,8 +164,9 @@ public:
 			return false;
 		}
 
-		if (::connect(*sock_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-			sock_fd = nullptr;
+		if (::connect(sock_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+			zsock_close(sock_fd);
+			sock_fd = -1;
 			return false;
 		}
 
@@ -190,7 +198,7 @@ public:
 		};
 
 		while (resolve_attempts--) {
-			ret = getaddrinfo(host, String(port).c_str(), &hints, &res);
+			ret = zsock_getaddrinfo(host, String(port).c_str(), &hints, &res);
 
 			if (ret == 0) {
 				break;
@@ -253,8 +261,9 @@ public:
 			res = nullptr;
 		}
 
-		if (!rv && *sock_fd >= 0) {
-			sock_fd = nullptr;
+		if (!rv && sock_fd >= 0) {
+			zsock_close(sock_fd);
+			sock_fd = -1;
 		}
 		return rv;
 	}
@@ -308,8 +317,9 @@ public:
 	}
 
 	void close() {
-		if (sock_fd) {
-			sock_fd = nullptr;
+		if (sock_fd != -1) {
+			zsock_close(sock_fd);
+			sock_fd = -1;
 		}
 	}
 
@@ -329,8 +339,9 @@ public:
 
 		zsock_ioctl(*sock_fd, ZFD_IOCTL_FIONBIO);
 
-		if (::bind(*sock_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-			sock_fd = nullptr;
+		if (::bind(sock_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+			zsock_close(sock_fd);
+			sock_fd = -1;
 			return false;
 		}
 
@@ -342,8 +353,9 @@ public:
 			return false;
 		}
 
-		if (::listen(*sock_fd, backlog) < 0) {
-			sock_fd = nullptr;
+		if (::listen(sock_fd, backlog) < 0) {
+			zsock_close(sock_fd);
+			sock_fd = -1;
 			return false;
 		}
 
