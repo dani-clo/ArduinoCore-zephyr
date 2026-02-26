@@ -3,12 +3,8 @@
  * Configures peripherals for Arduino Core compatibility
  */
 
-/* USB CDC-ACM UART for console */
-&zephyr_udc0 {
-    board_cdc_acm_uart: board_cdc_acm_uart {
-        compatible = "zephyr,cdc-acm-uart";
-        status = "okay";
-    };
+&board_cdc_acm_uart {
+	status = "okay";
 };
 
 /* I2C buses */
@@ -136,7 +132,7 @@
     };
 
     /* used to overcome problems with _C analog pins */
-    gpioz: gpio@deadbeef {
+    gpiozz: gpio@deadbeef {
         compatible = "vnd,gpio";
         gpio-controller;
         reg = <0xdeadbeef 0x1000>;
