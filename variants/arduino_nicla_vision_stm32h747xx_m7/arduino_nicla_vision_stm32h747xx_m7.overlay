@@ -193,9 +193,17 @@
                             <&gpioa 9 GPIO_ACTIVE_HIGH>,    /* D1 PA_9 */
                             <&gpioa 10 GPIO_ACTIVE_HIGH>,   /* D2 PA_10 */
                             <&gpiog 1 GPIO_ACTIVE_HIGH>,    /* D3 PG_1 */
-                            <&gpioe 3 GPIO_ACTIVE_HIGH>,    /* Red LED PE_3 */
-                            <&gpioc 13 GPIO_ACTIVE_HIGH>,   /* Green LED PC_13 */
-                            <&gpiof 4 GPIO_ACTIVE_HIGH>;    /* Blue LED PF_4 */
+                            <&gpioe 3 GPIO_ACTIVE_HIGH>,    /* D4 Red LED PE_3 */
+                            <&gpioc 13 GPIO_ACTIVE_HIGH>,   /* D5 Green LED PC_13 */
+                            <&gpiof 4 GPIO_ACTIVE_HIGH>,    /* D6 Blue LED PF_4 */
+                            <&gpiof 6 GPIO_ACTIVE_HIGH>,    /* D7 PF_6 - SPI5 NSS */
+                            <&gpiof 7 GPIO_ACTIVE_HIGH>,    /* D8 PF_7 - SPI5 SCK */
+                            <&gpiof 8 GPIO_ACTIVE_HIGH>,    /* D9 PF_8 - SPI5 MISO */
+                            <&gpiof 11 GPIO_ACTIVE_HIGH>,   /* D10 PF_11 - SPI5 MOSI */
+                            <&gpioe 11 GPIO_ACTIVE_HIGH>,   /* D11 PE_11 - SPI4 NSS */
+                            <&gpioe 12 GPIO_ACTIVE_HIGH>,   /* D12 PE_12 - SPI4 SCK */
+                            <&gpioe 13 GPIO_ACTIVE_HIGH>,   /* D13 PE_13 - SPI4 MISO */
+                            <&gpioe 14 GPIO_ACTIVE_HIGH>;   /* D14 PE_14 - SPI4 MOSI */
 
         adc-pin-gpios = <&gpioc 4 GPIO_ACTIVE_HIGH>,  /* A0 PC_4 */
                         <&gpiof 13 GPIO_ACTIVE_HIGH>, /* A1 PF_13 */
