@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Arduino s.r.l. and/or its affiliated companies
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 FORCE_GROUP_ALLOCATION
 
 SECTIONS {
@@ -41,12 +47,6 @@ SECTIONS {
         __static_thread_data_list_end = .;
     }
 
-    .rodata : {
-        *(.rodata)
-        *(.rodata1)
-        *(.rodata.*)
-    }
-
     .data : {
         *(.data .data.*)
     }
@@ -79,10 +79,6 @@ SECTIONS {
 
     .shstrtab : {
         KEEP(*(.shstrtab))
-    }
-
-    .rel : {
-        KEEP(*(.rel .rel.*))
     }
 
     .got : {

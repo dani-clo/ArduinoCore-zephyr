@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Arduino s.r.l. and/or its affiliated companies
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #pragma once
 
 #include <zephyr/net/dhcpv4.h>
@@ -59,5 +65,6 @@ public:
 
 	int begin(bool blocking = true, uint64_t additional_event_mask = 0);
 
+	void end();
 	bool disconnect();
 };

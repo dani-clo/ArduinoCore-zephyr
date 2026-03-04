@@ -275,12 +275,15 @@ void noTone(pin_size_t pinNumber) {
 	gpio_pin_set_dt(&arduino_pins[pinNumber], 0);
 }
 
-void delay(unsigned long ms) {
+__attribute__((always_inline)) void delay(unsigned long ms) {
 	k_sleep(K_MSEC(ms));
 }
 
-void delayMicroseconds(unsigned int us) {
-	k_sleep(K_USEC(us));
+__attribute__((always_inline)) void delayMicroseconds(unsigned int us) {
+	if (us == 0) {
+		return;
+	}
+	k_busy_wait(us - 1);
 }
 
 unsigned long micros(void) {
@@ -480,23 +483,17 @@ long random(long max) {
 
 #endif
 
-#ifdef CONFIG_GPIO_GET_DIRECTION
-
 unsigned long pulseIn(pin_size_t pinNumber, uint8_t state, unsigned long timeout) {
 	struct k_timer timer;
 	int64_t start, end, delta = 0;
 	const struct gpio_dt_spec *spec = &arduino_pins[pinNumber];
 
+	if (!gpio_is_ready_dt(spec)) {
+		return 0;
+	}
+
 	k_timer_init(&timer, NULL, NULL);
 	k_timer_start(&timer, K_MSEC(timeout), K_NO_WAIT);
-
-	if (!gpio_is_ready_dt(spec)) {
-		goto cleanup;
-	}
-
-	if (!gpio_pin_is_input_dt(spec)) {
-		goto cleanup;
-	}
 
 	while (gpio_pin_get_dt(spec) == state && k_timer_status_get(&timer) == 0)
 		;
@@ -524,8 +521,6 @@ cleanup:
 	k_timer_stop(&timer);
 	return (unsigned long)delta;
 }
-
-#endif // CONFIG_GPIO_GET_DIRECTION
 
 void enableInterrupt(pin_size_t pinNumber) {
 	struct gpio_port_callback *pcb = find_gpio_port_callback(arduino_pins[pinNumber].port);

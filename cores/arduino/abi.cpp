@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Arduino SA
+ * Copyright (c) Arduino s.r.l. and/or its affiliated companies
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -21,19 +21,6 @@ int __cxa_atexit(void (*func)(void *), void *arg, void *dso_handle) {
 	(void)arg;
 	(void)dso_handle; // unused
 	return 0;
-}
-
-int atexit(void (*func)(void)) {
-	(void)func;
-	return 0;
-}
-
-int strcmp(const char *s1, const char *s2) {
-	while (*s1 && (*s1 == *s2)) {
-		s1++;
-		s2++;
-	}
-	return *(const unsigned char *)s1 - *(const unsigned char *)s2;
 }
 
 } /* extern "C" */

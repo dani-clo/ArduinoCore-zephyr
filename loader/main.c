@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Arduino SA
+ * Copyright (c) Arduino s.r.l. and/or its affiliated companies
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -23,6 +23,8 @@ LOG_MODULE_REGISTER(sketch);
 #include <zephyr/drivers/uart.h>
 #include <zephyr/usb/usb_device.h>
 
+#include <zephyr/devicetree/fixed-partitions.h>
+
 #define HEADER_LEN 16
 
 struct sketch_header_v1 {
@@ -35,6 +37,8 @@ struct sketch_header_v1 {
 #define SKETCH_FLAG_DEBUG     0x01
 #define SKETCH_FLAG_LINKED    0x02
 #define SKETCH_FLAG_IMMEDIATE 0x04
+
+#define SKETCH_RAM_BUFFER_LEN 131072
 
 #define TARGET_HAS_USB_CDC                                                                         \
 	DT_NODE_HAS_PROP(DT_PATH(zephyr_user), cdc_acm) &&                                             \
@@ -95,9 +99,22 @@ void llext_entry(void *arg0, void *arg1, void *arg2) {
 }
 #endif /* CONFIG_USERSPACE */
 
+/* Export Flash parameters for use by core building scripts */
 __attribute__((retain)) const uintptr_t sketch_base_addr =
 	DT_REG_ADDR(DT_GPARENT(DT_NODELABEL(user_sketch))) + DT_REG_ADDR(DT_NODELABEL(user_sketch));
 __attribute__((retain)) const uintptr_t sketch_max_size = DT_REG_SIZE(DT_NODELABEL(user_sketch));
+
+/* Determine maximum size of the loader application */
+#if DT_HAS_FIXED_PARTITION_LABEL(image_0) /* "image_0" partition size */
+#define LOADER_MAX_SIZE DT_REG_SIZE(DT_NODE_BY_FIXED_PARTITION_LABEL(image_0))
+#elif CONFIG_FLASH_LOAD_SIZE > 0 /* forced value from Kconfig */
+#define LOADER_MAX_SIZE CONFIG_FLASH_LOAD_SIZE
+#elif CONFIG_FLASH_LOAD_OFFSET /* heuristic: size of Flash minus load offset */
+#define LOADER_MAX_SIZE (DT_REG_SIZE(DT_NODELABEL(flash0)) - CONFIG_FLASH_LOAD_OFFSET)
+#else /* default: size of whole Flash */
+#define LOADER_MAX_SIZE DT_REG_SIZE(DT_NODELABEL(flash0))
+#endif
+__attribute__((retain)) const uintptr_t loader_max_size = LOADER_MAX_SIZE;
 
 static int loader(const struct shell *sh) {
 	const struct flash_area *fa;
@@ -171,12 +188,12 @@ static int loader(const struct shell *sh) {
 		uint8_t *ram_firmware = NULL;
 		uint32_t *ram_start = (uint32_t *)0x20000000;
 		if (!sketch_valid) {
-			ram_firmware = (uint8_t *)malloc(64 * 1024);
+			ram_firmware = (uint8_t *)malloc(SKETCH_RAM_BUFFER_LEN);
 			if (!ram_firmware) {
 				printk("Failed to allocate RAM for firmware\n");
 				return -ENOMEM;
 			}
-			memset(ram_firmware, 0, 64 * 1024);
+			memset(ram_firmware, 0, SKETCH_RAM_BUFFER_LEN);
 			*ram_start = (uint32_t)&ram_firmware[0];
 		}
 		if (gpio_pin_get_dt(&spec) == 0) {

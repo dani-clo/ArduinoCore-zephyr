@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Arduino s.r.l. and/or its affiliated companies
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #include "SocketHelpers.h"
 
 #include <zephyr/net/ethernet.h>
@@ -51,8 +57,6 @@ public:
 	int begin(IPAddress ip, IPAddress dns, IPAddress gateway, IPAddress subnet) {
 		return begin(nullptr, ip, dns, gateway, subnet);
 	}
-
-	void end(void);
 
 	void setRetransmissionTimeout(uint16_t milliseconds);
 	void setRetransmissionCount(uint8_t num);

@@ -1,6 +1,7 @@
 /*
- * Arduino Nicla Vision Overlay
- * Configures peripherals for Arduino Core compatibility
+ * Copyright (c) Arduino s.r.l. and/or its affiliated companies
+ *
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 &board_cdc_acm_uart {

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Arduino s.r.l. and/or its affiliated companies
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 &zephyr_udc0 {
 	board_cdc_acm_uart: board_cdc_acm_uart {
 		compatible = "zephyr,cdc-acm-uart";
@@ -340,11 +346,11 @@
 };
 
 
+/delete-node/ &slot0_partition;
+
 &flash0 {
 	bank2-flash-size = <1024>;
 	partitions {
-		/delete-node/ slot0_partition;
-
 		slot0_partition: partition@40000 {
 			label = "image-0";
 			reg = <0x040000 0xa0000>;

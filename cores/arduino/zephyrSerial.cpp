@@ -52,7 +52,7 @@ enum uart_config_data_bits conf_data_bits(uint16_t conf) {
 
 void arduino::ZephyrSerial::begin(unsigned long baud, uint16_t conf) {
 	struct uart_config config = {
-		.baudrate = baud,
+		.baudrate = static_cast<uint32_t>(baud),
 		.parity = conf_parity(conf),
 		.stop_bits = conf_stop_bits(conf),
 		.data_bits = conf_data_bits(conf),
@@ -126,9 +126,9 @@ int arduino::ZephyrSerial::available() {
 int arduino::ZephyrSerial::availableForWrite() {
 	int ret;
 
-	k_sem_take(&rx.sem, K_FOREVER);
-	ret = ring_buf_space_get(&rx.ringbuf);
-	k_sem_give(&rx.sem);
+	k_sem_take(&tx.sem, K_FOREVER);
+	ret = ring_buf_space_get(&tx.ringbuf);
+	k_sem_give(&tx.sem);
 
 	return ret;
 }

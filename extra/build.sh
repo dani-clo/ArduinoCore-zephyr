@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (c) Arduino s.r.l. and/or its affiliated companies
+# SPDX-License-Identifier: Apache-2.0
+
 set -e
 
 source venv/bin/activate
@@ -105,6 +108,7 @@ extra/gen_provides.py "${BUILD_DIR}/zephyr/zephyr.elf" -LF \
 	"+kheap__system_heap" \
 	"*sketch_base_addr=_sketch_start" \
 	"*sketch_max_size=_sketch_max_size" \
+	"*loader_max_size=_loader_max_size" \
 	"malloc=__wrap_malloc" \
 	"free=__wrap_free" \
 	"realloc=__wrap_realloc" \

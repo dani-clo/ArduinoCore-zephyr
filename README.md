@@ -11,7 +11,7 @@ boards](https://github.com/zephyrproject-rtos/arduino-core-zephyr) that
 includes support for Arduino software tools, allowing it to be seamlessly used
 by the [Arduino IDE](https://docs.arduino.cc/software/ide/),
 [Arduino CLI](https://docs.arduino.cc/arduino-cli/) and
-[Arduino AppLab](https://docs.arduino.cc/software/app-lab/).
+[Arduino App Lab](https://docs.arduino.cc/software/app-lab/).
 
 ## 🧐 What is Zephyr? 
 
@@ -113,7 +113,9 @@ The most important components of this project are:
 > utility via `go build` and run it as `sync-zephyr-artifacts .` to retrieve
 > the precompiled files for the current revision of the core. 
 >
-> Next, follow the instructions in [Using the Core in Arduino IDE/CLI](#using-the-core-in-arduino-idecli).
+> Next, follow the instructions in [Using the Core in Arduino IDE/CLI](#using-the-core-in-arduino-idecli)
+> or [Using the Core in the Arduino App Lab](#using-the-core-in-the-arduino-app-lab) 
+> to start using the core in your preferred Arduino software.
 > Remember to [update the loader on your board](#flash-the-loader) as well.
 
 ## 🛠️ Setup a Zephyr build environment
@@ -139,7 +141,7 @@ Before running the installation script, ensure that Python, `pip` and `venv` are
 
 #### On Ubuntu or similar apt-based distros
 ```bash
-sudo apt install python3-pip python3-setuptools python3-venv build-essential git cmake ninja-build zstd jq
+sudo apt install python3-pip python3-setuptools python3-venv build-essential git cmake ninja-build zstd jq rsync
 ```
 #### On macOS
 Make sure you have Homebrew installed. Then run:
@@ -242,6 +244,41 @@ will be `arduino-git:zephyr:name_from_boards_txt`.
 
 Remember to also install and/or update the officially published core in the IDE Board Manager to get the latest tools and dependencies. 
 [⚙️ Installation](#️-installation).
+
+### Using the Core in the Arduino App Lab
+
+> [!WARNING] 
+> Arduino App Lab expects a hardcoded FQBN (`arduino:zephyr:unoq` for the UNO Q), so the [technique used for Arduino IDE/CLI](#using-the-core-in-arduino-idecli) **does not** work. A small workaround is required.
+
+1. Disable the release core
+
+```bash
+mv ~/.arduino15/packages/arduino/hardware/zephyr ~/.arduino15/packages/arduino/hardware/zephyr.disable
+```
+This ensures the installation of the development version of the core will be used instead of the release installation.
+
+2. Install your custom core
+
+Place your custom core in the following path:
+```bash
+~/Arduino/hardware/arduino/zephyr
+```
+
+3. Flash the new loader
+
+Build and flash the loader from your custom core to overwrite the release version.
+For example, on UNO Q:
+```bash
+arduino-cli burn-bootloader -b arduino:zephyr:unoq -P jlink
+```
+
+#### Revert to release core
+
+If you want to use the official core again, change the directory names so the one in `~/.arduino15` is `zephyr`, and the one in your sketchbook's hardware folder is `zephyr.disable`:
+```bash
+mv ~/.arduino15/packages/arduino/hardware/zephyr.disable ~/.arduino15/packages/arduino/hardware/zephyr
+mv ~/Arduino/hardware/arduino/zephyr ~/Arduino/hardware/arduino/zephyr.disable
+```
 
 ## 🚀 Adding a new target
 

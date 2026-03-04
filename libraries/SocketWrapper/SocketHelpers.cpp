@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Arduino s.r.l. and/or its affiliated companies
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
 #include "SocketHelpers.h"
 
 #include <zephyr/logging/log.h>
@@ -154,6 +160,10 @@ int NetworkInterface::begin(bool blocking, uint64_t additional_event_mask) {
 	int ret = net_mgmt_event_wait_on_iface(netif, NET_EVENT_IPV4_ADDR_ADD, NULL, NULL, NULL,
 										   blocking ? K_FOREVER : K_SECONDS(1));
 	return (ret == 0) ? 1 : 0;
+}
+
+void NetworkInterface::end() {
+	disconnect();
 }
 
 bool NetworkInterface::disconnect() {
