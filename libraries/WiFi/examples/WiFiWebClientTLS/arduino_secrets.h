@@ -4,5 +4,5 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#define SECRET_SSID ""
-#define SECRET_PASS ""
+#define SECRET_SSID "Arduinoboards"
+#define SECRET_PASS "arduinotest"

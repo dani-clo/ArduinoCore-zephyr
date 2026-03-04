@@ -15,6 +15,9 @@
 #include <zephyr/net/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <errno.h>
+
+extern "C" int *arduino_errno_ptr(void);
 
 class ZephyrSocketWrapper {
 protected:
@@ -110,7 +113,10 @@ public:
 	}
 
 #if defined(CONFIG_NET_SOCKETS_SOCKOPT_TLS)
-	bool connectSSL(const char *host, uint16_t port, const char *ca_certificate_pem = nullptr) {
+	bool connectSSL(const char *host, uint16_t port, const char *ca_certificate_pem = nullptr, const char *sni_hostname = nullptr) {
+
+		// Use sni_hostname if provided, otherwise use host for SNI
+		const char *hostname_for_sni = sni_hostname ? sni_hostname : host;
 
 		// Resolve address
 		struct addrinfo hints = {0};
@@ -133,7 +139,7 @@ public:
 		};
 
 		while (resolve_attempts--) {
-			ret = zsock_getaddrinfo(host, String(port).c_str(), &hints, &res);
+			ret = getaddrinfo(host, String(port).c_str(), &hints, &res);
 
 			if (ret == 0) {
 				break;
@@ -149,7 +155,7 @@ public:
 		if (ca_certificate_pem != nullptr) {
 			ret = tls_credential_add(CA_CERTIFICATE_TAG, TLS_CREDENTIAL_CA_CERTIFICATE,
 									 ca_certificate_pem, strlen(ca_certificate_pem) + 1);
-			if (ret != 0) {
+			if (ret != 0 && ret != -EEXIST) {
 				goto exit;
 			}
 		}
@@ -159,9 +165,17 @@ public:
 			goto exit;
 		}
 
-		if (setsockopt(sock_fd, SOL_TLS, TLS_HOSTNAME, host, strlen(host)) ||
-			setsockopt(sock_fd, SOL_TLS, TLS_SEC_TAG_LIST, sec_tag_opt, sizeof(sec_tag_opt)) ||
-			setsockopt(sock_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout_opt, sizeof(timeout_opt))) {
+		if (setsockopt(sock_fd, SOL_TLS, TLS_HOSTNAME, hostname_for_sni, strlen(hostname_for_sni) + 1) < 0) {
+			goto exit;
+		}
+
+		if (ca_certificate_pem != nullptr) {
+			if (setsockopt(sock_fd, SOL_TLS, TLS_SEC_TAG_LIST, sec_tag_opt, sizeof(sec_tag_opt)) < 0) {
+				goto exit;
+			}
+		}
+
+		if (setsockopt(sock_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout_opt, sizeof(timeout_opt)) < 0) {
 			goto exit;
 		}
 

@@ -13,8 +13,11 @@
 char ssid[] = SECRET_SSID;
 char pass[] = SECRET_PASS;
 
-char server[] = "www.howsmyssl.com";
-int port = 443;
+const char server[] = "34.71.45.200";  // Direct IP instead of hostname (DNS issue)
+const char server_hostname[] = "www.howsmyssl.com";  // Real hostname for TLS SNI
+const char path[] = "/a/check";
+const int port = 443;
+const int connect_retries = 3;
 
 ZephyrSSLClient client;
 int status = WL_IDLE_STATUS;
@@ -79,20 +82,40 @@ void setup() {
   Serial.print("RSSI: ");
   Serial.println(WiFi.RSSI());
 
-  Serial.println("\nStarting connection to server...");
+  Serial.println("\nStarting TLS connection to server...");
 
-  if (client.connect(server, port, isrg_root_x1)) {
-    Serial.println("Connected to server!");
+  bool connected = false;
+  for (int attempt = 1; attempt <= connect_retries; attempt++) {
+    Serial.print("TLS connect attempt ");
+    Serial.print(attempt);
+    Serial.print("/");
+    Serial.println(connect_retries);
 
-    // Make HTTP request
-    client.println("GET /a/check HTTP/1.1");
-    client.print("Host: ");
-    client.println(server);
-    client.println("Connection: close");
-    client.println();
-  } else {
-    Serial.println("Connection failed!");
+    // Use IP for connection, but pass real hostname for SNI (Server Name Indication)
+    connected = client.connect(server, port, server_hostname, isrg_root_x1);
+    if (connected) {
+      break;
+    }
+
+    Serial.println("Connection failed");
+    delay(1000);
   }
+
+  if (!connected) {
+    Serial.println("TLS connection failed after retries.");
+    return;
+  }
+
+  Serial.println("Connected to server!");
+
+  // Make HTTP request
+  client.print("GET ");
+  client.print(path);
+  client.println(" HTTP/1.1");
+  client.print("Host: ");
+  client.println(server_hostname);  // Use real hostname for HTTP Host header
+  client.println("Connection: close");
+  client.println();
 }
 
 void loop() {

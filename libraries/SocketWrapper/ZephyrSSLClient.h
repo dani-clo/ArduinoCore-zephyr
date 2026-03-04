@@ -23,5 +23,10 @@ public:
 	int connect(const char *host, uint16_t port, const char *cert) {
 		return connectSSL(host, port, cert);
 	}
+
+	// Connect with separate IP and hostname for SNI (useful when DNS doesn't work)
+	int connect(const char *ip_address, uint16_t port, const char *sni_hostname, const char *cert) {
+		return connectSSL(ip_address, port, cert, sni_hostname);
+	}
 };
 #endif

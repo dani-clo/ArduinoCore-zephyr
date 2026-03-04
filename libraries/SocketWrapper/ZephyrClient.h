@@ -58,6 +58,14 @@ public:
 		}
 		return ret;
 	}
+
+	int connectSSL(const char *host, uint16_t port, const char *cert, const char *sni_hostname) {
+		auto ret = ZephyrSocketWrapper::connectSSL(host, port, cert, sni_hostname);
+		if (ret) {
+			_connected = true;
+		}
+		return ret;
+	}
 #endif
 	uint8_t connected() override {
 		return _connected;
@@ -118,6 +126,10 @@ public:
 
 	String remoteIP() {
 		return ZephyrSocketWrapper::remoteIP();
+	}
+
+	int lastErrno() {
+		return *arduino_errno_ptr();
 	}
 	friend class ZephyrServer;
 };
