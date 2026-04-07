@@ -10,6 +10,7 @@
 #include <zephyr/sys/ring_buffer.h>
 #include <zephyr/kernel.h>
 #include <api/HardwareSerial.h>
+#include <zephyrPinctrl.h>
 
 namespace arduino {
 
@@ -106,10 +107,6 @@ protected:
 	const struct device *uart;
 	ZephyrSerialBuffer<CONFIG_ARDUINO_API_SERIAL_BUFFER_SIZE> tx;
 	ZephyrSerialBuffer<CONFIG_ARDUINO_API_SERIAL_BUFFER_SIZE> rx;
-
-	virtual void _reinit_if_needed() {
-		device_init(uart);
-	}
 };
 
 } // namespace arduino

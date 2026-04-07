@@ -109,8 +109,10 @@
 		status = "okay";
 		/* tim1_etr_pa12 is not available for PWM */
 		zephyr,deferred-init;
-		pinctrl-0 = <&tim1_ch4_pa11 &tim1_ch3n_pb15  &tim1_ch2n_pb14 &tim1_ch1n_pb13>;
-		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim1_ch4_pa11 &tim1_ch3n_pb15 &tim1_ch1n_pb13 &tim1_ch2n_pb14>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -123,8 +125,10 @@
 	pwm2: pwm {
 		status = "okay";
 		zephyr,deferred-init;
-		pinctrl-0 = <&tim2_ch2_pb3 &tim2_ch3_pb10 &tim2_ch4_pb11>;
-		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim2_ch2_pb3 &tim2_ch3_pb10 &tim2_ch4_pb11>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -135,8 +139,10 @@
 	pwm3: pwm {
 		status = "okay";
 		zephyr,deferred-init;
-		pinctrl-0 = <&tim3_ch3_pb0 &tim3_ch4_pb1 &tim3_ch1_pb4>;
-		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim3_ch3_pb0 &tim3_ch4_pb1 &tim3_ch1_pb4>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -147,8 +153,10 @@
 	pwm4: pwm {
 		status = "okay";
 		zephyr,deferred-init;
-		pinctrl-0 = <&tim4_ch3_pb8 &tim4_ch4_pb9 /*&tim4_ch1_pb6 &tim4_ch2_pb7*/>;
-		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim4_ch3_pb8 &tim4_ch4_pb9 /*&tim4_ch1_pb6 &tim4_ch2_pb7*/>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -159,9 +167,20 @@
     pwm5: pwm {
         status = "okay";
         zephyr,deferred-init;
-        pinctrl-0 = <&tim5_ch1_ph10 &tim5_ch2_ph11 &tim5_ch3_ph12>;
-        pinctrl-names = "default";
+        pinctrl-0 = <>;
+        pinctrl-1 = <>;
+        pinctrl-2 = <&tim5_ch1_ph10 &tim5_ch2_ph11 &tim5_ch3_ph12>;
+        pinctrl-names = "default", "sleep", "arduino";
     };
+};
+
+&adc1 {
+	zephyr,deferred-init;
+	pinctrl-0 = <>;
+	pinctrl-1 = <>;
+	pinctrl-2 = <&adc1_in9_pa4 &adc1_in10_pa5 &adc1_in11_pa6 &adc1_in12_pa7 &adc1_in2_pc1 &adc1_in1_pc0>;
+	pinctrl-names = "default", "sleep", "arduino";
+	status = "okay";
 };
 
 /* Currently only the pins marked with ~ on the pin headers are enabled */
@@ -172,8 +191,10 @@
 	pwm8: pwm {
 		status = "okay";
 		zephyr,deferred-init;
-		pinctrl-0 = <&tim8_ch4n_pb2>;
-		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim8_ch4n_pb2>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -214,6 +235,7 @@
 
 &fdcan1 {
 	status = "okay";
+	zephyr,deferred-init;
 	pinctrl-0 = <&fdcan1_rx_pa11 &fdcan1_tx_pa12>;
 	pinctrl-names = "default";
 	clocks = <&rcc STM32_CLOCK_BUS_APB1_2 0x00000200>,

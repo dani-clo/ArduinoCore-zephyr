@@ -14,6 +14,8 @@
 &usart1 {
 	status = "okay";
 	/* usart1 is not set as deferred-init to catch early boot logs since it is assigned to zephyr,console */
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pb7>;
+	pinctrl-names = "default";
 };
 
 &usart2 {
@@ -35,6 +37,8 @@
 &usart6 {
 	status = "okay";
 	zephyr,deferred-init;
+	pinctrl-0 = <&usart6_tx_pg14 &usart6_rx_pc7>;
+	pinctrl-names = "default";
 };
 
 &rtc {
@@ -84,10 +88,10 @@
 	pwm1: pwm {
 		status = "okay";
 		zephyr,deferred-init;
-		/* Temporarily removed SPI1 pins */
-		/* pinctrl-0 = <&tim1_ch3_pj9 &tim1_ch1_pk1 &tim1_ch2_pj11>; */
-		pinctrl-0 = <&tim1_ch3_pj9 &tim1_ch1_pk1>;
-		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim1_ch3_pj9 &tim1_ch1_pk1 &tim1_ch2_pj11>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -97,9 +101,11 @@
 
 	pwm2: pwm {
 		status = "okay";
-                zephyr,deferred-init;
-		pinctrl-0 = <&tim2_ch4_pa3  &tim2_ch3_pa2>;
-		pinctrl-names = "default";
+		zephyr,deferred-init;
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim2_ch4_pa3 &tim2_ch3_pa2>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -109,9 +115,11 @@
 
 	pwm3: pwm {
 		status = "okay";
-                zephyr,deferred-init;
-		pinctrl-0 = <&tim3_ch2_pa7 &tim3_ch1_pb4>;
-		pinctrl-names = "default";
+		zephyr,deferred-init;
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim3_ch2_pa7 &tim3_ch1_pb4>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -121,9 +129,11 @@
 
 	pwm4: pwm {
 		status = "okay";
-                zephyr,deferred-init;
-		pinctrl-0 = <&tim4_ch2_pd13 &tim4_ch3_pb8 &tim4_ch4_pb9>;
-		pinctrl-names = "default";
+		zephyr,deferred-init;
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;	
+		pinctrl-2 = <&tim4_ch2_pd13 &tim4_ch3_pb8 &tim4_ch4_pb9>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
@@ -134,23 +144,26 @@
 	pwm8: pwm {
 		status = "okay";
 		zephyr,deferred-init;
-		/* Temporarily removed SPI1 pins */
-		/* pinctrl-0 = <&tim8_ch1_pj8 &tim8_ch2_pj10>; */
-		pinctrl-0 = <&tim8_ch1_pj8>;
-		pinctrl-names = "default";
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim8_ch1_pj8 &tim8_ch2_pj10>;
+		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
-/* Temporarily removed SPI1 pins */
-/* &timers12 { */
-/*	status = "okay"; */
-/* 	st,prescaler = <100>; */
-/*	pwm12: pwm { */
-/* 		status = "okay"; */
-/* 		pinctrl-0 = <&tim12_ch1_ph6>; */
-/* 		pinctrl-names = "default"; */
-/* 	}; */
-/*}; */
+&timers12 {
+	status = "okay";
+	st,prescaler = <100>;
+
+	pwm12: pwm {
+		status = "okay";
+		zephyr,deferred-init;
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim12_ch1_ph6>;
+		pinctrl-names = "default", "sleep", "arduino";
+	};
+};
 
 &pwm1 {
 	/* Use the pwmclock node to start the clock generation */
@@ -173,6 +186,7 @@
 
 &fdcan2 {
 	status = "okay";
+	zephyr,deferred-init;
 	clocks = <&rcc STM32_CLOCK(APB1_2, 8)>,
 		 <&rcc STM32_SRC_HSE FDCAN_SEL(0)>;
 };
@@ -217,7 +231,9 @@
 
 &adc1 {
 	zephyr,deferred-init;
-	pinctrl-0 = <&adc1_inp4_pc4
+	pinctrl-0 = <>;
+	pinctrl-1 = <>;
+	pinctrl-2 = <&adc1_inp4_pc4
 		&adc1_inp8_pc5
 		&adc1_inp9_pb0
 		&adc1_inp5_pb1
@@ -225,11 +241,11 @@
 		&adc1_inp12_pc2
 		&adc1_inp10_pc0
 		&adc1_inp16_pa0
-		&adc1_inp18_pa4
-		&adc1_inp19_pa5
+		&adc1_inp1_pa1_c
 		&adc1_inp0_pa0_c
-		&adc1_inp1_pa1_c>;
-	pinctrl-names = "default";
+		&adc1_inp18_pa4
+		&adc1_inp19_pa5>;
+	pinctrl-names = "default", "sleep", "arduino";
 	st,adc-clock-source = "SYNC";
 	st,adc-prescaler = <4>;
 	status = "okay";
@@ -326,9 +342,10 @@
 
 &adc3 {
 	zephyr,deferred-init;
-	pinctrl-0 = <&adc3_inp0_pc2_c
-		&adc3_inp1_pc3_c>;
-	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	pinctrl-1 = <>;
+	pinctrl-2 = <&adc3_inp0_pc2_c &adc3_inp1_pc3_c>;
+	pinctrl-names = "default", "sleep", "arduino";
 	st,adc-clock-source = "SYNC";
 	st,adc-prescaler = <4>;
 	status = "okay";
@@ -354,6 +371,10 @@
 
 &dac1 {
 	zephyr,deferred-init;
+	pinctrl-0 = <>;
+	pinctrl-1 = <>;
+	pinctrl-2 = <&dac1_out1_pa4 &dac1_out2_pa5>;
+	pinctrl-names = "default", "sleep", "arduino";
 };
 
 /{
@@ -556,12 +577,12 @@
 			   <&pwm3 1 PWM_HZ(500) PWM_POLARITY_NORMAL>,
 			   <&pwm4 3 PWM_HZ(500) PWM_POLARITY_NORMAL>,
 			   <&pwm4 4 PWM_HZ(500) PWM_POLARITY_NORMAL>,
-				/* Temporarily removed SPI1 pins */
-			   /* <&pwm1 1 PWM_HZ(5000) PWM_POLARITY_NORMAL>, */
-			   /* <&pwm8 2 PWM_HZ(500) PWM_POLARITY_NORMAL>, */
-			   /* <&pwm1 2 PWM_HZ(5000) PWM_POLARITY_NORMAL>, */
-			   /* <&pwm12 1 PWM_HZ(500) PWM_POLARITY_NORMAL>; */
-   			   <&pwm1 1 PWM_HZ(5000) PWM_POLARITY_NORMAL>;
+			   /* D10-D13 in arduino_header order */
+			   <&pwm1 1 PWM_HZ(5000) PWM_POLARITY_NORMAL>,
+			   <&pwm8 2 PWM_HZ(500) PWM_POLARITY_NORMAL>,
+			   <&pwm1 2 PWM_HZ(5000) PWM_POLARITY_NORMAL>,
+			   <&pwm12 1 PWM_HZ(500) PWM_POLARITY_NORMAL>,
+			   <&pwm1 1 PWM_HZ(5000) PWM_POLARITY_NORMAL>;
 
 		io-channels =	<&adc1 4>,
 				<&adc1 8>,
