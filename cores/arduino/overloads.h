@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#pragma once
+
 #ifdef CONFIG_DAC
 
 void analogWrite(enum dacPins pinNumber, int value);
