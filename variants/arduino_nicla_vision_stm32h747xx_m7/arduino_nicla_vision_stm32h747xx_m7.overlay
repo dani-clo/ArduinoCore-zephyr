@@ -221,7 +221,7 @@
                         <&gpioh 6 GPIO_ACTIVE_HIGH>;
 
         serials = <&board_cdc_acm_uart>, <&usart1>, <&lpuart1>;
-        cdc-acm = <&board_cdc_acm_uart>;
+        cdc-acm-serial = <&board_cdc_acm_uart>;
 
         i2cs = <&i2c1>, <&i2c2>, <&i2c3>;
         spis = <&spi4>, <&spi5>;
