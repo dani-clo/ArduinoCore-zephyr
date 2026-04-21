@@ -78,7 +78,7 @@
 };
 
 &adc1 {
-    pinctrl-0 = <&adc1_inp4_pc4 &adc1_inp5_pb1 &adc1_inp12_pc2 &adc1_inp13_pc3>;
+    pinctrl-0 = <&adc1_inp4_pc4>;
     pinctrl-names = "default";
     st,adc-clock-source = "SYNC";
     st,adc-prescaler = <4>;
@@ -104,8 +104,8 @@
     };
 };
 
-&adc3 {
-    pinctrl-0 = <&adc3_inp0_pc2_c &adc3_inp1_pc3_c>;
+&adc2 {
+    pinctrl-0 = <&adc2_inp2_pf13>;
     pinctrl-names = "default";
     st,adc-clock-source = "SYNC";
     st,adc-prescaler = <4>;
@@ -114,15 +114,28 @@
     #address-cells = <1>;
     #size-cells = <0>;
 
-    channel@0 {
-        reg = <0>;
+    channel@2 {
+        reg = <2>;
         zephyr,gain = "ADC_GAIN_1";
         zephyr,reference = "ADC_REF_INTERNAL";
         zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
         zephyr,resolution = <16>;
     };
-    channel@1 {
-        reg = <1>;
+};
+
+&adc3 {
+    zephyr,deferred-init;
+    pinctrl-0 = <&adc3_inp5_pf3>;
+    pinctrl-names = "default";
+    st,adc-clock-source = "SYNC";
+    st,adc-prescaler = <4>;
+    status = "okay";
+
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    channel@5 {
+        reg = <5>;
         zephyr,gain = "ADC_GAIN_1";
         zephyr,reference = "ADC_REF_INTERNAL";
         zephyr,acquisition-time = <ADC_ACQ_TIME_MAX>;
@@ -206,11 +219,14 @@
                             <&gpioe 3 GPIO_ACTIVE_HIGH>,    /* Red LED PE_3 */
                             <&gpioc 13 GPIO_ACTIVE_HIGH>,   /* Green LED PC_13 */
                             <&gpiof 4 GPIO_ACTIVE_HIGH>,    /* Blue LED PF_4 */
-							<&gpiog 0 GPIO_ACTIVE_HIGH>;	/* SE05X_EN */
+							<&gpiog 0 GPIO_ACTIVE_HIGH>,	/* SE05X_EN */
+                            <&gpioc 4 GPIO_ACTIVE_HIGH>,    /* PC4 A0 ADC1 ch4  */
+                            <&gpiof 13 GPIO_ACTIVE_HIGH>,   /* PF13 A1 ADC2 ch2  */
+                            <&gpiof 3 GPIO_ACTIVE_HIGH>;    /* PF3 A2 ADC3 ch5  */
 
-        adc-pin-gpios = <&gpioc 4 GPIO_ACTIVE_HIGH>,  /* A0 PC_4 */
-                        <&gpiof 13 GPIO_ACTIVE_HIGH>, /* A1 PF_13 */
-                        <&gpiof 3 GPIO_ACTIVE_HIGH>;  /* A2 PF_3 */
+        adc-pin-gpios = <&gpioc 4 GPIO_ACTIVE_HIGH>,   /* A0 PC4  */
+                        <&gpiof 13 GPIO_ACTIVE_HIGH>,   /* A1 PF13 */
+                        <&gpiof 3 GPIO_ACTIVE_HIGH>;    /* A2 PF3  */
 
         pwm-pin-gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>,
                         <&gpioc 6 GPIO_ACTIVE_HIGH>,
@@ -226,9 +242,9 @@
         i2cs = <&i2c1>, <&i2c2>, <&i2c3>;
         spis = <&spi4>, <&spi5>;
 
-        io-channels = <&adc1 0>,
-                      <&adc3 0>,
-                      <&adc1 6>;
+        io-channels = <&adc1 4>,
+                  <&adc2 2>,
+                  <&adc3 5>;
 
         builtin-led-gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>, /* Green LED PC_13 (LED_BUILTIN) */
                             <&gpioe 3 GPIO_ACTIVE_HIGH>,  /* Red LED PE_3 */
