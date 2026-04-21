@@ -108,7 +108,7 @@ uint32_t map64(uint32_t x, uint32_t in_min, uint32_t in_max, uint32_t out_min, u
 
 #if defined(CONFIG_DAC) || defined(CONFIG_PWM)
 void analogWriteResolution(int bits) {
-	_analog_write_resolution = bits;
+	_analog_write_resolution = CLAMP(bits, 1, 31);
 }
 
 int analogWriteResolution() {
@@ -201,7 +201,7 @@ void __attribute__((weak)) analogReference(uint8_t mode) {
 }
 
 void analogReadResolution(int bits) {
-	read_resolution = bits;
+	read_resolution = CLAMP(bits, 1, 31);
 }
 
 int analogReadResolution() {
