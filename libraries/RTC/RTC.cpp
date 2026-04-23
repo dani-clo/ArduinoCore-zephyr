@@ -5,6 +5,7 @@
  */
 
 #include "RTC.h"
+#include <errno.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -159,7 +160,8 @@ int Rtc::getSeconds() {
 	return -1;
 }
 
-#if defined(CONFIG_RTC_STM32) || defined(CONFIG_RTC_RPI_PICO)
+#if !defined(CONFIG_COUNTER_NRF_RTC) // For boards with a dedicated RTC peripheral/driver, we use
+									 // the Zephyr RTC
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(rtc), okay)
 #define RTC_NODE DT_NODELABEL(rtc)
@@ -408,7 +410,9 @@ void Rtc::alarmCallbackWrapper([[maybe_unused]] const struct device *dev,
  */
 int Rtc::setUpdateCallback(RtcUpdateCallback cb, void *user_data) {
 #if defined(CONFIG_RTC_RPI_PICO)
-	return -1;
+	ARG_UNUSED(cb);
+	ARG_UNUSED(user_data);
+	return -ENOTSUP;
 #else
 	userUpdateCallback = cb;
 	userUpdateCallbackData = user_data;
@@ -445,7 +449,8 @@ void Rtc::updateCallbackWrapper([[maybe_unused]] const struct device *dev, void 
  */
 int Rtc::setCalibration(int32_t calibration) {
 #if defined(CONFIG_RTC_RPI_PICO)
-	return -1;
+	ARG_UNUSED(calibration);
+	return -ENOTSUP;
 #else
 	return rtc_set_calibration(rtc_dev, calibration);
 #endif
@@ -462,14 +467,16 @@ int Rtc::setCalibration(int32_t calibration) {
  */
 int Rtc::getCalibration(int32_t &calibration) {
 #if defined(CONFIG_RTC_RPI_PICO)
-	return -1;
+	ARG_UNUSED(calibration);
+	return -ENOTSUP;
 #else
 	return rtc_get_calibration(rtc_dev, &calibration);
 #endif
 }
 
-#elif defined(CONFIG_COUNTER_NRF_RTC) // For other platforms (nordic), we must use the counter API
-									  // to implement RTC functionality
+#else // For other platforms (i.e. Nordic), we must use the counter API to implement RTC
+	  // functionality
+
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(rtc1), okay)
 #define COUNTER_NODE DT_NODELABEL(rtc1)
 #elif DT_NODE_HAS_STATUS(DT_NODELABEL(rtc2), okay)
@@ -503,8 +510,13 @@ static bool is_leap(int year) {
  */
 void Rtc::alarmHandler(const struct device *dev, uint8_t chan_id, uint32_t ticks, void *user_data) {
 	Rtc *rtc = static_cast<Rtc *>(user_data);
-	if (rtc->user_callback) {
-		rtc->user_callback(dev, chan_id, ticks, rtc->user_data);
+	ARG_UNUSED(dev);
+	ARG_UNUSED(chan_id);
+	ARG_UNUSED(ticks);
+
+	rtc->alarmPending = false;
+	if (rtc->userAlarmCallback) {
+		rtc->userAlarmCallback(rtc->userAlarmCallbackData);
 	} else {
 		printk("Alarm triggered but no callback registered! Channel: %d, Ticks: %u\n", chan_id,
 			   ticks);
@@ -520,8 +532,6 @@ void Rtc::alarmHandler(const struct device *dev, uint8_t chan_id, uint32_t ticks
 Rtc::Rtc() {
 	counter_dev = DEVICE_DT_GET_OR_NULL(COUNTER_NODE);
 	timeOffset = 0;
-	user_callback = nullptr;
-	user_data = nullptr;
 }
 
 /**
@@ -612,14 +622,12 @@ int Rtc::getTime(int &year, int &month, int &day, int &hour, int &minute, int &s
  * @param hour      Target alarm hour.
  * @param minute    Target alarm minute.
  * @param second    Target alarm second.
- * @param callback  Function pointer to the user-defined callback.
- * @param cb_user_data Pointer to user data passed to the callback when triggered.
+ * @param cb        Function pointer to the user-defined callback.
+ * @param user_data Pointer to user data passed to the callback when triggered.
  * @return 0 if successful, or a negative error code if the target time is invalid.
  */
 int Rtc::setAlarm(int year, int month, int day, int hour, int minute, int second,
-				  void (*callback)(const struct device *dev, uint8_t chan_id, uint32_t ticks,
-								   void *user_data),
-				  void *cb_user_data) {
+				  RtcAlarmCallback cb, void *user_data) {
 	time_t target_epoch = datetimeToEpoch(year, month, day, hour, minute, second);
 	uint32_t freq = counter_get_frequency(counter_dev);
 	uint32_t current_ticks;
@@ -639,8 +647,10 @@ int Rtc::setAlarm(int year, int month, int day, int hour, int minute, int second
 	uint32_t alarm_ticks = current_ticks + delta_seconds * freq;
 
 	// Save user callback
-	user_callback = callback;
-	user_data = cb_user_data;
+	userAlarmCallback = cb;
+	userAlarmCallbackData = user_data;
+	alarmEpoch = target_epoch;
+	alarmPending = true;
 
 	alarm_cfg.flags = 0; // Absolute alarm
 	alarm_cfg.ticks = alarm_ticks;
@@ -650,8 +660,10 @@ int Rtc::setAlarm(int year, int month, int day, int hour, int minute, int second
 	int ret = counter_set_channel_alarm(counter_dev, 0, &alarm_cfg);
 	if (ret != 0) {
 		printk("Failed to set alarm: %d\n", ret);
-		user_callback = nullptr;
-		user_data = nullptr;
+		userAlarmCallback = nullptr;
+		userAlarmCallbackData = nullptr;
+		alarmEpoch = 0;
+		alarmPending = false;
 		return ret;
 	}
 
@@ -670,31 +682,36 @@ int Rtc::cancelAlarm() {
 	if (ret != 0) {
 		printk("Failed to cancel alarm: %d\n", ret);
 	}
-	user_callback = nullptr;
-	user_data = nullptr;
+	userAlarmCallback = nullptr;
+	userAlarmCallbackData = nullptr;
+	alarmEpoch = 0;
+	alarmPending = false;
 	return ret;
 }
 
 /**
  * @brief Retrieves the currently configured alarm time.
- * This function is not supported and will return -1 to indicate this.
  *
- * @return -1 to indicate not supported.
+ * @return 0 on success, or a negative error code if no alarm is active.
  */
 int Rtc::getAlarm([[maybe_unused]] int &year, [[maybe_unused]] int &month,
 				  [[maybe_unused]] int &day, [[maybe_unused]] int &hour,
 				  [[maybe_unused]] int &minute, [[maybe_unused]] int &second) {
-	return -1;
+	if (!alarmPending) {
+		return -ENOENT;
+	}
+
+	epochToDatetime(alarmEpoch, year, month, day, hour, minute, second);
+	return 0;
 }
 
 /**
  * @brief Checks whether an alarm is currently pending.
- * This function is not supported and will return false to indicate this.
  *
- * @return false to indicate not supported.
+ * @return true if an alarm is pending, false otherwise.
  */
 bool Rtc::isAlarmPending() {
-	return false;
+	return alarmPending;
 }
 
 /**
@@ -705,7 +722,7 @@ bool Rtc::isAlarmPending() {
  */
 int Rtc::setUpdateCallback([[maybe_unused]] RtcUpdateCallback cb,
 						   [[maybe_unused]] void *user_data) {
-	return -1;
+	return -ENOTSUP;
 }
 
 /**
@@ -715,7 +732,7 @@ int Rtc::setUpdateCallback([[maybe_unused]] RtcUpdateCallback cb,
  * @return -1 to indicate not supported.
  */
 int Rtc::setCalibration([[maybe_unused]] int32_t calibration) {
-	return -1;
+	return -ENOTSUP;
 }
 
 /**
@@ -725,7 +742,7 @@ int Rtc::setCalibration([[maybe_unused]] int32_t calibration) {
  * @return -1 to indicate not supported.
  */
 int Rtc::getCalibration([[maybe_unused]] int32_t &calibration) {
-	return -1;
+	return -ENOTSUP;
 }
 
 /**
@@ -815,6 +832,4 @@ void Rtc::epochToDatetime(time_t t, int &year, int &month, int &day, int &hour, 
 	month = m + 1;
 	day = days + 1;
 }
-#else
-#error "Unsupported RTC configuration"
-#endif /* CONFIG_RTC_STM32 || CONFIG_RTC_RPI_PICO */
+#endif /* !defined(CONFIG_COUNTER) */

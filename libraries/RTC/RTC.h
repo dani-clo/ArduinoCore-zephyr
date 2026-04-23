@@ -223,7 +223,6 @@ public:
 	 */
 	int getTime(int &year, int &month, int &day, int &hour, int &minute, int &second);
 
-#if defined(CONFIG_RTC_STM32) || defined(CONFIG_RTC_RPI_PICO)
 	/**
 	 * @brief Schedules an alarm for a specific time.
 	 *
@@ -242,79 +241,11 @@ public:
 
 	/**
 	 * @brief Cancels the currently active alarm.
-	 * @return 0 on success, negative error code otherwise.
-	 */
-	int cancelAlarm();
-
-#else
-	/**
-	 * @brief Sets an RTC alarm for boards using the Zephyr counter driver.
-	 *
-	 * @param year Target year.
-	 * @param month Target month.
-	 * @param day Target day.
-	 * @param hour Target hour.
-	 * @param minute Target minute.
-	 * @param second Target second.
-	 * @param callback Function pointer for the alarm event.
-	 * @param cb_user_data Pointer to user data passed to the callback.
-	 * @return 0 on success, negative error code otherwise.
-	 */
-	int setAlarm(int year, int month, int day, int hour, int minute, int second,
-				 void (*callback)(const struct device *dev, uint8_t chan_id, uint32_t ticks,
-								  void *user_data),
-				 void *cb_user_data);
-
-	/**
-	 * @brief Cancels an active alarm.
 	 *
 	 * @return 0 on success, negative error code otherwise.
 	 */
 	int cancelAlarm();
 
-	/**
-	 * @brief Retrieves the currently configured alarm time.
-	 *
-	 * @return -1 to indicate not supported.
-	 */
-	int getAlarm([[maybe_unused]] int &year, [[maybe_unused]] int &month, [[maybe_unused]] int &day,
-				 [[maybe_unused]] int &hour, [[maybe_unused]] int &minute,
-				 [[maybe_unused]] int &second);
-
-	/**
-	 * @brief Checks whether an alarm is currently pending.
-	 * This function is not supported and will return -1 to indicate this.
-	 *
-	 * @return false to indicate not supported.
-	 */
-	bool isAlarmPending();
-
-	/**
-	 * @brief Registers an update callback function.
-	 * This function is not supported and will return -1 to indicate this.
-	 *
-	 * @return -1 to indicate not supported.
-	 */
-	int setUpdateCallback([[maybe_unused]] RtcUpdateCallback cb, [[maybe_unused]] void *user_data);
-
-	/**
-	 * @brief Sets the Rtc calibration value.
-	 * This function is not supported and will return -1 to indicate this.
-	 *
-	 * @return -1 to indicate not supported.
-	 */
-	int setCalibration([[maybe_unused]] int32_t calibration);
-
-	/**
-	 * @brief Retrieves the current Rtc calibration value.
-	 * This function is not supported and will return -1 to indicate this.
-	 *
-	 * @return -1 to indicate not supported.
-	 */
-	int getCalibration([[maybe_unused]] int32_t &calibration);
-#endif
-
-#if defined(CONFIG_RTC_STM32) || defined(CONFIG_RTC_RPI_PICO)
 	/**
 	 * @brief Retrieves the currently configured alarm time.
 	 *
@@ -339,6 +270,7 @@ public:
 	 * @brief Registers an update callback function.
 	 *
 	 * The callback is invoked when the RTC generates an update event.
+	 * Some backends may return `-ENOTSUP` if this feature is unavailable.
 	 *
 	 * @param cb Function pointer for the update callback.
 	 * @param user_data Optional user data passed to the callback.
@@ -349,6 +281,8 @@ public:
 	/**
 	 * @brief Applies a calibration correction to the RTC.
 	 *
+	 * Some backends may return `-ENOTSUP` if this feature is unavailable.
+	 *
 	 * @param calibration Calibration offset in parts per million (ppm).
 	 * @return 0 on success, negative error code otherwise.
 	 */
@@ -357,14 +291,22 @@ public:
 	/**
 	 * @brief Reads the current RTC calibration setting.
 	 *
+	 * Some backends may return `-ENOTSUP` if this feature is unavailable.
+	 *
 	 * @param calibration Reference to store the current calibration value in ppm.
 	 * @return 0 on success, negative error code otherwise.
 	 */
 	int getCalibration(int32_t &calibration);
-#endif
 
 private:
-#if defined(CONFIG_RTC_STM32) || defined(CONFIG_RTC_RPI_PICO)
+	RtcAlarmCallback userAlarmCallback = nullptr; /**< User-registered alarm callback. */
+	void *userAlarmCallbackData = nullptr;        /**< User data for alarm callback. */
+
+	RtcUpdateCallback userUpdateCallback = nullptr; /**< User-registered update callback. */
+	void *userUpdateCallbackData = nullptr;         /**< User data for update callback. */
+
+#if !defined(CONFIG_COUNTER_NRF_RTC) // For boards with a dedicated RTC peripheral/driver, we use
+									 // the Zephyr RTC API directly
 	/** @brief Pointer to the Zephyr RTC device. */
 	const struct device *rtc_dev;
 
@@ -375,15 +317,10 @@ private:
 	/** @brief Internal static wrapper for update callbacks. */
 	static void updateCallbackWrapper([[maybe_unused]] const struct device *dev, void *user_data);
 
-	RtcAlarmCallback userAlarmCallback = nullptr; /**< User-registered alarm callback. */
-	void *userAlarmCallbackData = nullptr;        /**< User data for alarm callback. */
-
-	RtcUpdateCallback userUpdateCallback = nullptr; /**< User-registered update callback. */
-	void *userUpdateCallbackData = nullptr;         /**< User data for update callback. */
-
 	uint16_t alarmId = 0; /**< Default alarm identifier. */
 
-#else // For boards without a dedicated RTC, we use the counter API to implement RTC functionality
+#else // For boards without an RTC driver (i.e. Nordic), we must use the counter API to implement
+	  // RTC functionality
 	/** @brief Pointer to the Zephyr counter device used as RTC backend. */
 	const struct device *counter_dev;
 
@@ -393,12 +330,11 @@ private:
 	/** @brief Counter driver alarm configuration. */
 	struct counter_alarm_cfg alarm_cfg;
 
-	/** @brief User-registered callback for counter-based alarms. */
-	void (*user_callback)(const struct device *dev, uint8_t chan_id, uint32_t ticks,
-						  void *user_data);
+	/** @brief Indicates whether a counter-backed alarm is currently active. */
+	bool alarmPending = false;
 
-	/** @brief User data associated with the alarm callback. */
-	void *user_data;
+	/** @brief Cached alarm time for counter-backed implementations. */
+	time_t alarmEpoch = 0;
 
 	/** @brief Static handler for counter alarm interrupts. */
 	static void alarmHandler(const struct device *dev, uint8_t chan_id, uint32_t ticks,
