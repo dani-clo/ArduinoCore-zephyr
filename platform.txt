@@ -6,6 +6,10 @@
 name=Arduino Zephyr Boards (BETA)
 version=9.9.9
 
+# Architecture aliases - allows libraries with architectures=zephyr
+# to be found and compatible even if the platform folder name is different
+architecture.aliases=zephyr
+
 # Compile variables
 # ------------------------
 
