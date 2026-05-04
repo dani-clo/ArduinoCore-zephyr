@@ -5,7 +5,6 @@
  */
 
 #include "SPI.h"
-#include "zephyrInternal.h"
 #include <zephyr/kernel.h>
 
 arduino::ZephyrSPI::ZephyrSPI(const struct device *spi) : spi_dev(spi) {
