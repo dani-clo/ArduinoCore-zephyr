@@ -47,6 +47,15 @@ user_sketch: &slot1_partition {};
 						<&gpiob 2 0>, /* A1 */
 						<&gpiob 5 0>; /* A2 */
 
+		adc-pin-gpios =	<&gpiob 0 0>, /* A0 */
+				<&gpiob 2 0>, /* A1 */
+				<&gpiob 5 0>, /* A2 */
+				<&gpioc 0 0>, /* A3 */
+				<&gpioa 6 0>, /* A4 */
+				<&gpioa 7 0>, /* A5 */
+				<&gpiob 1 0>, /* A6 */
+				<&gpiob 3 0>; /* A7 */
+
 		pwms = <&timer0_pwm 0 255 PWM_POLARITY_INVERTED>,
 				<&timer0_pwm 1 255 PWM_POLARITY_INVERTED>,
 				<&timer0_pwm 2 255 PWM_POLARITY_INVERTED>;
