@@ -17,7 +17,7 @@ private:
 
 protected:
 	void setSocket(int sock) {
-		sock_fd = sock;
+		sock_fd = std::shared_ptr<int>(sock < 0 ? nullptr : new int(sock), socket_deleter);
 		_connected = true;
 	}
 
@@ -47,6 +47,11 @@ public:
 	}
 #endif
 	uint8_t connected() override {
+		uint8_t buf;
+		int ret = ::recv(*sock_fd, &buf, 1, MSG_PEEK | MSG_DONTWAIT);
+		if (ret == 0) {
+			stop();
+		}
 		return _connected;
 	}
 
@@ -99,7 +104,7 @@ public:
 	}
 
 	operator bool() {
-		return sock_fd != -1;
+		return (sock_fd != nullptr);
 	}
 
 	String remoteIP() {
