@@ -9,6 +9,8 @@
 #
 # The core under test should be extracted in the 'ArduinoCore-zephyr' subdirectory.
 
+set -e
+
 if [ "$#" -lt 2 ] ; then
 	echo "Usage: $0 <artifact> <variant> [<additional_library_paths>...]"
 	exit 1
@@ -60,9 +62,11 @@ get_latest_release() {
 	local url=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" | jq -r '.tarball_url')
 	shift 2
 
-	echo "Getting latest release for ${repo}"
+	echo "::group::Getting latest release for ${repo}"
 
 	fetch_and_extract "$url" "*-${project}-*" "ArduinoCore-zephyr/${folder}/${project}" "$@"
+
+	echo "::endgroup::"
 }
 
 get_branch_tip() {
@@ -73,9 +77,11 @@ get_branch_tip() {
 	local url="https://github.com/${repo}/archive/refs/heads/${branch}.tar.gz"
 	shift 3
 
-	echo "Getting branch ${branch} of ${repo}"
+	echo "::group::Getting branch ${branch} of ${repo}"
 
 	fetch_and_extract "$url" "${project}-${branch}" "ArduinoCore-zephyr/${folder}/${project}" "$@"
+
+	echo "::endgroup::"
 }
 
 ALL_TESTS=$(mktemp)
