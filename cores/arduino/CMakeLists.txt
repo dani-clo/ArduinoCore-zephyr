@@ -9,6 +9,13 @@ zephyr_sources(zephyrCommon.cpp)
 zephyr_sources(USB.cpp)
 zephyr_sources(itoa.cpp)
 
+zephyr_sources(wiring_analog.cpp)
+zephyr_sources(wiring_digital.cpp)
+zephyr_sources(wiring_pulse.cpp)
+zephyr_sources(Tone.cpp)
+zephyr_sources(WMath.cpp)
+zephyr_sources(WInterrupts.cpp)
+
 if(DEFINED CONFIG_ARDUINO_ENTRY)
 zephyr_sources(main.cpp)
 zephyr_sources(threads.cpp)

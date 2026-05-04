@@ -5,7 +5,7 @@
  */
 
 #include <zephyr/kernel.h>
-#include <zephyrInternal.h>
+#include <zephyr/drivers/gpio.h>
 #include <stm32_backup_domain.h>
 
 void _on_1200_bps() {
