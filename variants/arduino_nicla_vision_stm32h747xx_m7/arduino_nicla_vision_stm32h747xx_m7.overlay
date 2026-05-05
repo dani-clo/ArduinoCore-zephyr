@@ -33,6 +33,14 @@
     zephyr,deferred-init;
 };
 
+&gc2145 {
+    zephyr,deferred-init;
+};
+
+&dcmi {
+    zephyr,deferred-init;
+};
+
 /* SPI buses */
 &spi4 {
     status = "okay";
@@ -66,7 +74,20 @@
     };
 };
 
-/* Note: timers3 is configured for camera clock generation in base .dts */
+&timers3 {
+	status = "okay";
+	st,prescaler = <0>;
+
+	cam_clock_pwm: pwm {
+		status = "okay";
+		zephyr,deferred-init;
+		pinctrl-0 = <>;
+		pinctrl-1 = <>;
+		pinctrl-2 = <&tim3_ch2_pa7>;
+		pinctrl-names = "default", "sleep", "arduino";
+	};
+};
+
 
 &timers8 {
     status = "okay";
@@ -176,6 +197,7 @@
         zephyr,console = &lpuart1;
         zephyr,shell-uart = &lpuart1;
         zephyr,log-uart = &log_uarts;
+        arduino,camera-clock = &pwmclock;
     };
 
 	log_uarts: log_uarts {
