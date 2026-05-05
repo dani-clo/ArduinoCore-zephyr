@@ -107,7 +107,7 @@ bool Camera::begin(uint32_t width, uint32_t height, uint32_t pixformat, bool byt
 	// Allocate video buffers.
 	for (size_t i = 0; i < ARRAY_SIZE(this->vbuf); i++) {
 		this->vbuf[i] = video_buffer_aligned_alloc(fmt.pitch * fmt.height,
-												   CONFIG_VIDEO_BUFFER_POOL_ALIGN, K_FOREVER);
+												   CONFIG_VIDEO_BUFFER_POOL_ALIGN, K_MSEC(100));
 		if (this->vbuf[i] == NULL) {
 			Serial.println("Failed to allocate video buffers");
 			return false;
