@@ -13,6 +13,9 @@ void setup() {
     char printBuffer[64];
     delay(1000);
     Serial.begin(115200);
+    while (!Serial) {
+        ; // Wait for Serial to be ready
+    }
     if (!rtc.begin()) {
         printf("RTC not ready\n");
         return;

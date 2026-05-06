@@ -203,6 +203,26 @@ bool Rtc::begin() {
 }
 
 /**
+ * @brief Checks if the RTC has been configured and is running
+ *
+ * For boards with a dedicated RTC peripheral, verifies that:
+ * 1. The device is ready
+ * 2. A valid time has been set (by attempting to read it)
+ *
+ * @return bool true if RTC is running and has a valid time, false otherwise
+ */
+bool Rtc::isRunning() {
+	if (!device_is_ready(rtc_dev)) {
+		return false;
+	}
+
+	// Try to read the current time to verify it has been set
+	struct rtc_time time;
+	int ret = rtc_get_time(rtc_dev, &time);
+	return ret == 0;
+}
+
+/**
  * @brief Rtc library setter function
  *
  * Used to set the time and data with a single function call
@@ -556,6 +576,15 @@ bool Rtc::begin() {
 }
 
 /**
+ * @brief Checks if the RTC has been configured and is running
+ *
+ * @return bool true if RTC has been initialized with setTime(), false otherwise
+ */
+bool Rtc::isRunning() {
+	return isInitialized;
+}
+
+/**
  * @brief Sets the current RTC time.
  *
  * This function converts a date and time into epoch format and adjusts the
@@ -582,6 +611,7 @@ int Rtc::setTime(int year, int month, int day, int hour, int minute, int second)
 	}
 
 	timeOffset = target - (ticks / freq);
+	isInitialized = true;
 	return 0;
 }
 

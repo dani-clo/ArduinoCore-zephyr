@@ -14,11 +14,17 @@ char printBuffer[30];               // Allocate large enough buffer to hold the 
 
 void setup() {
     Serial.begin(115200);
+    while (!Serial) {
+        ; // Wait for Serial to be ready
+    }
     if (!rtc.begin()) {
         Serial.println("RTC not ready\n");
         return;
     }
-    rtc.setTime(2025, 10, 21, 12, 0, 0);
+    if (!rtc.isRunning()) {
+        Serial.println("RTC is not running, setting initial time to 2025-10-21 12:00:00\n");
+        rtc.setTime(2025, 10, 21, 12, 0, 0);
+    }
 }
 
 void loop() {

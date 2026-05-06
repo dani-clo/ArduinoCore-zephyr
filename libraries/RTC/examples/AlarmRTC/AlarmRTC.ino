@@ -26,7 +26,9 @@ void setup() {
     int ret = 0xDEADBEEFu; // Starting with a custom value for the return which will definitely lead to failure if not changed to zero (i.e. success) by the functions below
     char printBuffer[60];
     Serial.begin(115200);
-    delay(1000);
+    while (!Serial) {
+        ; // Wait for Serial to be ready
+    }
 
     if (!rtc.begin()) {
         Serial.println("RTC not ready\n");

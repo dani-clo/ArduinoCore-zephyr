@@ -80,6 +80,13 @@ public:
 	~Rtc();
 
 	/**
+	 * @brief Checks if the RTC device has been configured and is running.
+	 *
+	 * @return true if the RTC is running, false otherwise.
+	 */
+	bool isRunning();
+
+	/**
 	 * @brief Sets the current day of the month in the RTC.
 	 *
 	 * Updates only the day field of the current date and keeps other
@@ -335,6 +342,9 @@ private:
 
 	/** @brief Cached alarm time for counter-backed implementations. */
 	time_t alarmEpoch = 0;
+
+	/** @brief Tracks whether setTime() has been called for CONFIG_COUNTER. */
+	bool isInitialized = false;
 
 	/** @brief Static handler for counter alarm interrupts. */
 	static void alarmHandler(const struct device *dev, uint8_t chan_id, uint32_t ticks,
