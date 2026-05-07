@@ -423,6 +423,8 @@ jobs:
         run: |
           # gather the array of job metadata (especially name and ID) for the current workflow run
           export WORKFLOW_JOBS=$(gh run view ${{ github.run_id }} --attempt ${{ github.run_attempt }} --json jobs --jq '.jobs')
+          # Archive the input set of reports for later inspection
+          tar jchf build-reports-${{ needs.build-env.outputs.CORE_HASH }}.tar.bz2 zephyr-* arduino-*.json
           # Run the log inspection script
           extra/ci_inspect_logs.py result summary full_log
           cat result
@@ -471,12 +473,21 @@ jobs:
           retention-days: 1
 
       # upload new official test size artifact (for AWS storage)
-      - name: Archive sketch report information
+      - name: Archive sketch size information
         uses: actions/upload-artifact@v7
         if: ${{ github.event_name == 'push' }}
         with:
           name: size-reports
           path: size-reports-${{ needs.build-env.outputs.CORE_HASH }}.tar.bz2
+          retention-days: 1
+          archive: false
+
+      # upload input set of build reports artifact (for CI debugging)
+      - name: Archive input test reports
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-reports
+          path: build-reports-${{ needs.build-env.outputs.CORE_HASH }}.tar.bz2
           retention-days: 1
           archive: false
 
