@@ -15,7 +15,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.actor }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name != 'push' || github.repository != 'arduino/ArduinoCore-zephyr' }}
 
 env:
   # use the head SHA for PR hashes, instead of the merge commit
