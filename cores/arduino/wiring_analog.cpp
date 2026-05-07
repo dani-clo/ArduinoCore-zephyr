@@ -120,17 +120,18 @@ int analogWriteResolution() {
 
 void analogWrite(pin_size_t pinNumber, int value) {
 	const int maxInput = BIT(_analog_write_resolution) - 1U;
+	const int digitalThreshold = maxInput >> 1;
 	size_t idx = pwm_pin_index(pinNumber);
 
 	if (idx >= ARRAY_SIZE(arduino_pwm)) {
 		pinMode(pinNumber, OUTPUT);
-		digitalWrite(pinNumber, value > 127 ? HIGH : LOW);
+		digitalWrite(pinNumber, value > digitalThreshold ? HIGH : LOW);
 		return;
 	}
 
 	if (!pwm_is_ready_dt(&arduino_pwm[idx])) {
 		pinMode(pinNumber, OUTPUT);
-		digitalWrite(pinNumber, value > 127 ? HIGH : LOW);
+		digitalWrite(pinNumber, value > digitalThreshold ? HIGH : LOW);
 		return;
 	}
 
