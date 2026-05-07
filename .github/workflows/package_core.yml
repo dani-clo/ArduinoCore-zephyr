@@ -139,16 +139,19 @@ jobs:
           (cd ~ && tar --use-compress-program=unzstd -xpf build-env.tar.zstd && rm build-env.tar.zstd)
 
       - name: ccache
-        uses: hendrikmuhs/ccache-action@v1.2.21
+        uses: actions/cache@v5
         with:
-          verbose: 1
           key: ${{ github.job }}-${{ matrix.board }} # independent caches
+          path: ~/.cache/ccache
 
       - name: Build loader
         shell: bash
         run: |
           # create the report directory
           mkdir -p reports
+          echo "::group::ccache stats before build"
+          ccache --show-stats
+          echo "::endgroup::"
           # run the build, capturing stdout and stderr
           if ! ./extra/build.sh ${{ matrix.board }} 1> >(tee $REPORT.stdout) 2> >(tee $REPORT.stderr) ; then
             # build failed, capture errors in summary and stop job without artifacts
@@ -172,7 +175,12 @@ jobs:
                              | awk 'BEGIN {split("B KB MB GB", u); for(i in u) m[u[i]]=1024^(i-1)} /:/ {print "[\"" $1 "\"," $2*m[$3] "," $4*m[$5] "]"}' \
                              | sort \
                              | jq -s "map((select(.[0] == \"FLASH:\") | .[2]) |= ${LOADER_SIZE}) + [ [ \"SKETCH:\", 0, ${SKETCH_SIZE} ] ]" > $REPORT.meminfo
-          jq
+
+          # ccache stats update
+          echo "::group::ccache stats after build"
+          ccache --evict-older-than 30d
+          ccache --show-stats
+          echo "::endgroup::"
 
       - name: Package board artifacts
         if: ${{ !cancelled() }}
