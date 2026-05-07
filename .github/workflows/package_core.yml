@@ -7,6 +7,10 @@ name: Package, test and upload core
 
 on:
   push:
+    branches:
+      - '**'
+    tags-ignore:
+      - 'tools/**' # do not run on tags created for tool releases
   pull_request:
 
 concurrency:
