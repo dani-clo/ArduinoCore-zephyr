@@ -99,7 +99,6 @@ find ArduinoCore-zephyr/libraries/ -name library.properties | while read -r prop
 		[ -z "$dep" ] || printf " - name: \"%s\"\n" "$dep" >> $GITHUB_ENV
 	done
 done
-printf " - source-path: \"%s\"\n" $(find ArduinoCore-zephyr/libraries/ -maxdepth 1 -mindepth 1 -type d) >> $GITHUB_ENV
 echo "EOF" >> $GITHUB_ENV
 
 if [ -f $VARIANT_DIR/skip_these_examples.txt ] ; then
