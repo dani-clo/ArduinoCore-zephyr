@@ -57,6 +57,11 @@
       "packager": "arduino",
       "name": "gen-rodata-ld",
       "version": "0.1.1"
+    },
+    {
+      "packager": "arduino",
+      "name": "zephyr-check-size",
+      "version": "0.1.0"
     }
   ]
 }
