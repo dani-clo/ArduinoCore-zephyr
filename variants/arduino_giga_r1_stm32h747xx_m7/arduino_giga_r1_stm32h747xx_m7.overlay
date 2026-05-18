@@ -65,6 +65,10 @@
 	};
 };
 
+&gt911 {
+	zephyr,deferred-init;
+};
+
 &i2c1 {
 	status = "okay";
 	zephyr,deferred-init;
