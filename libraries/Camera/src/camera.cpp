@@ -41,6 +41,90 @@ static const struct pwm_dt_spec CLOCK_PWM = PWM_DT_SPEC_GET(CLOCK_NODE);
 #define CAMERA_ENDPOINT_NODE DT_CHILD(CAMERA_PORT_NODE, endpoint)
 #define CAMERA_SENSOR_NODE   DT_NODE_REMOTE_DEVICE(CAMERA_ENDPOINT_NODE)
 
+#ifdef CONFIG_USER_MANAGES_VIDEO_BUFFER_POOL
+K_HEAP_DEFINE(video_buffer_pool,
+		CONFIG_VIDEO_BUFFER_POOL_SZ_MAX * 2);
+#define VIDEO_COMMON_HEAP_ALLOC(align, size, timeout)                                              \
+	k_heap_aligned_alloc(&video_buffer_pool, align, size, timeout);
+#define VIDEO_COMMON_FREE(block) k_heap_free(&video_buffer_pool, block)
+
+struct mem_block {
+	void *data;
+};
+
+static struct video_buffer video_buf[CONFIG_VIDEO_BUFFER_POOL_NUM_MAX];
+static struct mem_block video_block[CONFIG_VIDEO_BUFFER_POOL_NUM_MAX];
+
+
+struct user_managed_video_buffer {
+	struct video_buffer vbuf;
+	void *data;
+};
+
+static struct user_managed_video_buffer user_video_buffers[CONFIG_VIDEO_BUFFER_POOL_NUM_MAX];
+
+struct video_buffer *user_video_buffer_aligned_alloc(size_t size, size_t align,
+							 k_timeout_t timeout)
+{
+	struct video_buffer *vbuf = NULL;
+	struct mem_block *block;
+	int i;
+
+	/* find available video buffer */
+	for (i = 0; i < ARRAY_SIZE(video_buf); i++) {
+		if (video_buf[i].buffer == NULL) {
+			vbuf = &video_buf[i];
+			block = &video_block[i];
+			break;
+		}
+	}
+
+	if (vbuf == NULL) {
+		printk("No available video buffer\n");
+		return NULL;
+	}
+
+	/* Alloc buffer memory */
+	block->data = VIDEO_COMMON_HEAP_ALLOC(align, size, timeout);
+	if (block->data == NULL) {
+		printk("Failed to allocate memory for video buffer\n");
+		return NULL;
+	}
+
+	vbuf->buffer = static_cast<uint8_t *>(block->data);
+	vbuf->size = size;
+	vbuf->bytesused = 0;
+
+	printk("Allocated video buffer: %p, size: %zu, align: %zu\n", vbuf->buffer, size, align);
+	
+	return vbuf;
+}
+
+void user_video_buffer_release(struct video_buffer *vbuf)
+{
+	struct mem_block *block = NULL;
+	int i;
+
+	if (vbuf == NULL) {
+		printk("Attempted to release a NULL video buffer\n");
+		return;
+	}
+
+	/* vbuf to block */
+	for (i = 0; i < ARRAY_SIZE(video_block); i++) {
+		if (video_block[i].data == vbuf->buffer) {
+			block = &video_block[i];
+			break;
+		}
+	}
+
+	vbuf->buffer = NULL;
+	if (block) {
+		VIDEO_COMMON_FREE(block->data);
+	}
+}
+#endif
+
 FrameBuffer::FrameBuffer() : vbuf(NULL) {
 }
 
