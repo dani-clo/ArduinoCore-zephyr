@@ -23,6 +23,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/device.h>
 #include <zephyr/devicetree/port-endpoint.h>
+#include <zephyr/multi_heap/shared_multi_heap.h>
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/drivers/video.h>
 #include <zephyr/drivers/video-controls.h>
@@ -42,61 +43,51 @@ static const struct pwm_dt_spec CLOCK_PWM = PWM_DT_SPEC_GET(CLOCK_NODE);
 #define CAMERA_SENSOR_NODE   DT_NODE_REMOTE_DEVICE(CAMERA_ENDPOINT_NODE)
 
 #ifdef CONFIG_USER_MANAGES_VIDEO_BUFFER_POOL
-K_HEAP_DEFINE(video_buffer_pool,
-		CONFIG_VIDEO_BUFFER_POOL_SZ_MAX * 2);
-#define VIDEO_COMMON_HEAP_ALLOC(align, size, timeout)                                              \
-	k_heap_aligned_alloc(&video_buffer_pool, align, size, timeout);
-#define VIDEO_COMMON_FREE(block) k_heap_free(&video_buffer_pool, block)
-
 struct mem_block {
 	void *data;
 };
 
-static struct video_buffer video_buf[CONFIG_VIDEO_BUFFER_POOL_NUM_MAX];
-static struct mem_block video_block[CONFIG_VIDEO_BUFFER_POOL_NUM_MAX];
-
-
-struct user_managed_video_buffer {
-	struct video_buffer vbuf;
-	void *data;
-};
-
-static struct user_managed_video_buffer user_video_buffers[CONFIG_VIDEO_BUFFER_POOL_NUM_MAX];
+static struct video_buffer user_video_buf[CONFIG_VIDEO_BUFFER_POOL_NUM_MAX];
+static struct mem_block user_video_block[CONFIG_VIDEO_BUFFER_POOL_NUM_MAX];
 
 struct video_buffer *user_video_buffer_aligned_alloc(size_t size, size_t align,
-							 k_timeout_t timeout)
+								 k_timeout_t timeout)
 {
 	struct video_buffer *vbuf = NULL;
-	struct mem_block *block;
+	struct mem_block *block = NULL;
 	int i;
 
-	/* find available video buffer */
-	for (i = 0; i < ARRAY_SIZE(video_buf); i++) {
-		if (video_buf[i].buffer == NULL) {
-			vbuf = &video_buf[i];
-			block = &video_block[i];
+	ARG_UNUSED(timeout);
+
+	if (size > CONFIG_VIDEO_BUFFER_POOL_SZ_MAX) {
+		printk("Requested size %zu exceeds max video buffer size %d\n",
+		       size, CONFIG_VIDEO_BUFFER_POOL_SZ_MAX);
+		return NULL;
+	}
+
+	for (i = 0; i < ARRAY_SIZE(user_video_buf); i++) {
+		if (user_video_buf[i].buffer == NULL) {
+			vbuf = &user_video_buf[i];
+			block = &user_video_block[i];
 			break;
 		}
 	}
 
 	if (vbuf == NULL) {
-		printk("No available video buffer\n");
 		return NULL;
 	}
 
-	/* Alloc buffer memory */
-	block->data = VIDEO_COMMON_HEAP_ALLOC(align, size, timeout);
+	block->data = shared_multi_heap_aligned_alloc(SMH_REG_ATTR_CACHEABLE, align, size);
 	if (block->data == NULL) {
-		printk("Failed to allocate memory for video buffer\n");
 		return NULL;
 	}
 
-	vbuf->buffer = static_cast<uint8_t *>(block->data);
+	vbuf->buffer = (uint8_t *)block->data;
 	vbuf->size = size;
 	vbuf->bytesused = 0;
 
-	printk("Allocated video buffer: %p, size: %zu, align: %zu\n", vbuf->buffer, size, align);
-	
+	printk("Allocated user video buffer number: %d size: %zu address: %p\n", i, size, block->data);
+
 	return vbuf;
 }
 
@@ -106,22 +97,24 @@ void user_video_buffer_release(struct video_buffer *vbuf)
 	int i;
 
 	if (vbuf == NULL) {
-		printk("Attempted to release a NULL video buffer\n");
 		return;
 	}
 
-	/* vbuf to block */
-	for (i = 0; i < ARRAY_SIZE(video_block); i++) {
-		if (video_block[i].data == vbuf->buffer) {
-			block = &video_block[i];
+	for (i = 0; i < ARRAY_SIZE(user_video_block); i++) {
+		if (user_video_buf[i].buffer == vbuf->buffer) {
+			block = &user_video_block[i];
 			break;
 		}
 	}
 
-	vbuf->buffer = NULL;
-	if (block) {
-		VIDEO_COMMON_FREE(block->data);
+	if (block && block->data) {
+		shared_multi_heap_free(block->data);
+		block->data = NULL;
 	}
+
+	vbuf->buffer = NULL;
+	vbuf->size = 0;
+	vbuf->bytesused = 0;
 }
 #endif
 
@@ -212,12 +205,25 @@ bool Camera::begin(uint32_t width, uint32_t height, uint32_t pixformat, bool byt
 		return false;
 	}
 
+#ifdef CONFIG_USER_MANAGES_VIDEO_BUFFER_POOL
+	static const struct video_user_buffer_ops user_buffer_ops = {
+		.aligned_alloc = user_video_buffer_aligned_alloc,
+		.release = user_video_buffer_release,
+	};
+
+	if (video_register_user_buffer_ops(&user_buffer_ops) != 0) {
+		Serial.println("Failed to register user video buffer ops");
+		return false;
+	}
+#endif
+
 	// Allocate video buffers.
 	for (size_t i = 0; i < ARRAY_SIZE(this->vbuf); i++) {
+		printk("Allocating video buffer number: %zu size: %u\n", i, fmt.pitch * fmt.height);
 		this->vbuf[i] = video_buffer_aligned_alloc(fmt.pitch * fmt.height,
 												   CONFIG_VIDEO_BUFFER_POOL_ALIGN, K_MSEC(100));
 		if (this->vbuf[i] == NULL) {
-			Serial.println("Failed to allocate video buffers");
+			Serial.println("Failed to allocate video buffers number: " + String(i));
 			return false;
 		}
 		video_enqueue(this->vdev, this->vbuf[i]);
