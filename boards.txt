@@ -728,3 +728,26 @@ nano_connect.debug.cortex-debug.custom.request=attach
 nano_connect.debug.svd_file={runtime.platform.path}/svd/rp2040.svd
 
 ##############################################################################################################
+
+nano_chandler.name=Arduino Nano Chandler
+nano_chandler.build.core=arduino
+nano_chandler.build.crossprefix=arm-zephyr-eabi-
+nano_chandler.build.compiler_path={runtime.tools.arm-zephyr-eabi-0.16.8.path}/bin/
+
+nano_chandler.menu.link_mode.dynamic=Dynamic
+nano_chandler.menu.link_mode.static=Static
+nano_chandler.menu.link_mode.static.build.link_mode=static
+nano_chandler.menu.link_mode.static.upload.extension=bin-zsk.bin
+
+nano_chandler.build.zephyr_target=arduino_nano_chandler
+nano_chandler.build.zephyr_args=
+nano_chandler.build.zephyr_hals=hal_microchip
+nano_chandler.build.artifact=zephyr_main
+nano_chandler.build.variant=arduino_nano_chandler_pic32ck1025gc01144
+nano_chandler.build.mcu=cortex-m33
+nano_chandler.build.fpu=
+nano_chandler.build.architecture=cortex-m33
+
+nano_chandler.build.float-abi=
+nano_chandler.build.extra_flags=
+nano_chandler.build.board=NANO_CHANDLER
