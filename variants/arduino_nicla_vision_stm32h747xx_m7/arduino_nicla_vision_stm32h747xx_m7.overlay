@@ -30,6 +30,7 @@
 
 &i2c3 {
     status = "okay";
+    zephyr,deferred-init;
 };
 
 &gc2145 {
@@ -47,6 +48,11 @@
 };
 
 &spi5 {
+    status = "okay";
+    zephyr,deferred-init;
+};
+
+&pwmclock {
     status = "okay";
     zephyr,deferred-init;
 };
