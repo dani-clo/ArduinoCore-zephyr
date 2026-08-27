@@ -23,6 +23,7 @@
 #include <mbedtls/debug.h>
 #endif
 
+
 #define FORCE_EXPORT_SYM(name)                                                                     \
 	extern void name(void);                                                                        \
 	EXPORT_SYMBOL(name);
@@ -302,6 +303,11 @@ FORCE_EXPORT_SYM(getpeername);
 FORCE_EXPORT_SYM(inet_ntop);
 #endif
 
+#if defined(CONFIG_DNS_RESOLVER)
+/* Lets a sketch report the resolver's current servers (WiFi.dnsServerIP()). */
+FORCE_EXPORT_SYM(dns_resolve_get_default);
+#endif
+
 #if defined(CONFIG_CDC_ACM_DTE_RATE_CALLBACK_SUPPORT)
 FORCE_EXPORT_SYM(cdc_acm_dte_rate_callback_set);
 #endif
@@ -319,6 +325,7 @@ FORCE_EXPORT_SYM(usbd_caps_speed);
 FORCE_EXPORT_SYM(usbd_can_detect_vbus);
 FORCE_EXPORT_SYM(usbd_enable);
 FORCE_EXPORT_SYM(usbd_disable);
+FORCE_EXPORT_SYM(usbd_shutdown);
 #endif
 
 #if defined(CONFIG_SHARED_MULTI_HEAP)
@@ -453,7 +460,7 @@ FORCE_EXPORT_SYM(matrixSetGrayscaleBits);
 FORCE_EXPORT_SYM(matrixEnd);
 #endif
 
-#if defined(CONFIG_FLASH)
+#if defined(CONFIG_FLASH_MAP)
 FORCE_EXPORT_SYM(flash_area_open);
 FORCE_EXPORT_SYM(flash_area_read);
 FORCE_EXPORT_SYM(flash_area_write);
@@ -503,7 +510,8 @@ EXPORT_SYMBOL(arm_irq_is_enabled);
 EXPORT_SYMBOL(arm_irq_priority_set);
 #endif
 
-#if defined(__arm__) && !defined(CONFIG_SOC_FAMILY_RPI_PICO)
+#if defined(__arm__) && !defined(CONFIG_SOC_FAMILY_RPI_PICO) &&                                      \
+	!defined(CONFIG_SOC_FAMILY_MICROCHIP_PIC32CK_SG_GC)
 EXPORT_SYMBOL(SystemCoreClock);
 #endif
 
@@ -524,4 +532,9 @@ EXPORT_SYMBOL(magic_location);
 #if defined(CONFIG_REGULATOR)
 FORCE_EXPORT_SYM(regulator_enable);
 FORCE_EXPORT_SYM(regulator_disable);
+#endif
+
+#if defined(CONFIG_BOOTLOADER_MCUBOOT)
+#include <zephyr/sys/reboot.h>
+EXPORT_SYMBOL(sys_reboot);
 #endif
