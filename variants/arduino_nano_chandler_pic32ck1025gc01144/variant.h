@@ -28,6 +28,7 @@
 #define RS485_DEFAULT_DE_PIN (28u)
 #define RS485_DEFAULT_RE_PIN (29u)
 
-/* Legacy spelling, kept for sketches that still use the CUSTOM_ names. */
-#define CUSTOM_RS485_DEFAULT_DE_PIN RS485_DEFAULT_DE_PIN
-#define CUSTOM_RS485_DEFAULT_RE_PIN RS485_DEFAULT_RE_PIN
+/* Same values, not aliased to RS485_DEFAULT_*_PIN to avoid a circular
+ * definition with RS485.h's own "#define RS485_DEFAULT_DE_PIN CUSTOM_...". */
+#define CUSTOM_RS485_DEFAULT_DE_PIN (28u)
+#define CUSTOM_RS485_DEFAULT_RE_PIN (29u)

@@ -296,7 +296,10 @@
 					    <&portc 16 0>,  /* D26 / LEDG */
 					    <&portc 17 0>,  /* D27 / LEDB */
 					    <&portd 5 0>,   /* D28 */
-					    <&portd 12 0>;  /* D29 */
+					    <&portd 12 0>,  /* D29 */
+						<&portc 14 0>,
+						<&portd 16 0>,
+						<&portd 14 0>;
 
 		builtin-led-gpios = <&portb 16 0>,
 					    <&portc 15 0>,
@@ -308,7 +311,7 @@
 		cans = <&can0>;
 
 		i2cs = <&sercom4>, <&sercom3>;
-		spis = <&sercom2>, <&sercom5>;
+		spis = <&sercom5>, <&sercom2>;
 
 		adc-pin-gpios = <&portb 12 0>,
 				<&porta 5 0>,

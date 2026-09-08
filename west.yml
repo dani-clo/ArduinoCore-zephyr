@@ -19,11 +19,13 @@ manifest:
       url-base: https://github.com/pillo79
     - name: gibix
       url-base: https://github.com/gibix
+    - name: dani-clo
+      url-base: https://github.com/dani-clo
 
   projects:
     - name: zephyr
-      remote: gibix
-      revision: nano-chandler
+      remote: dani-clo
+      revision: nano-chandler-tmp
       import:
         name-allowlist:
           - cmsis

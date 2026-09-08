@@ -18,6 +18,7 @@
 #include <zephyr/drivers/pinctrl.h>
 #include <zephyr/device.h>
 #include <zephyr/posix/unistd.h>
+#include <zephyr/sys/reboot.h>
 #if defined(CONFIG_MBEDTLS)
 #include <mbedtls/memory_buffer_alloc.h>
 #include <mbedtls/debug.h>
@@ -146,6 +147,7 @@ EXPORT_SYMBOL(k_msgq_num_used_get);
 EXPORT_SYMBOL(k_sys_work_q);
 EXPORT_SYMBOL(k_mem_slab_init);
 EXPORT_SYMBOL(k_mem_slab_free);
+
 
 #if defined(CONFIG_PINCTRL)
 EXPORT_SYMBOL(pinctrl_lookup_state);
@@ -534,7 +536,4 @@ FORCE_EXPORT_SYM(regulator_enable);
 FORCE_EXPORT_SYM(regulator_disable);
 #endif
 
-#if defined(CONFIG_BOOTLOADER_MCUBOOT)
-#include <zephyr/sys/reboot.h>
 EXPORT_SYMBOL(sys_reboot);
-#endif
