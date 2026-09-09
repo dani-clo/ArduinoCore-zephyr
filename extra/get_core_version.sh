@@ -48,6 +48,12 @@
 # The computed version is also written to a file in the Zephyr-compatible
 # VERSION format if a filename is provided as the first argument.
 
+debug_log() {
+	if [ "${CORE_VERSION_DEBUG:-${DEBUG_CORE_VERSION:-0}}" = "1" ] || [ "${CORE_VERSION_DEBUG:-${DEBUG_CORE_VERSION:-0}}" = "true" ]; then
+		echo "[get_core_version] $*" >&2
+	fi
+}
+
 # Determine pre-release label based on build context
 DATE="$(date -u '+%y%m%dt%H%Mz')"
 if [ -z "$GITHUB_ACTIONS" ]; then
@@ -101,7 +107,10 @@ else
 		# no additional information
 		v_tweak=""
 	else
-		version_from_git=$(git describe --tags --long --exclude '*/*' 2>/dev/null)
+		version_from_git=$(git describe --tags --long --exclude '*/*' 2>/dev/null || true)
+		debug_log "git describe --tags --long --exclude '*/*' => '${version_from_git:-<empty>}'"
+		debug_log "git rev-parse --is-shallow-repository => $(git rev-parse --is-shallow-repository 2>/dev/null || echo '<unknown>')"
+		debug_log "reachable tags: $(git tag --list | head -n 20 | tr '\n' ' ' 2>/dev/null || echo '<none>')"
 		# must match <maj>.<min>.<patch>(-<prerel>)-<number-of-commits-since-tag>-g<commit-hash>
 		pattern='^([0-9]+)\.([0-9]+)\.([0-9]+)(-.*)?-([0-9]+)-g.*'
 		if [[ $version_from_git =~ $pattern ]]; then
@@ -111,8 +120,21 @@ else
 			v_extra="${BASH_REMATCH[4]}" # optional, lead -
 			count="${BASH_REMATCH[5]}"
 		else
-			echo "Error: unexpected git describe output '$version_from_git'" >&2
-			exit 1
+			if [ -z "$version_from_git" ]; then
+				echo "Warning: no reachable tag found for HEAD; using synthetic fallback version" >&2
+				debug_log "HEAD=$(git rev-parse --short HEAD 2>/dev/null || echo '<unknown>')"
+				debug_log "ref=${GITHUB_REF:-<unset>} event=${GITHUB_EVENT_NAME:-<unset>} head_ref=${HEAD_REF:-<unset>}"
+				v_maj="9"
+				v_min="9"
+				v_patch="9"
+				v_extra="-0.${KIND}.${NAME}"
+				count="0"
+			else
+				echo "Error: unexpected git describe output '$version_from_git'" >&2
+				echo "Debug: GITHUB_REF='${GITHUB_REF:-<unset>}' GITHUB_EVENT_NAME='${GITHUB_EVENT_NAME:-<unset>}' HEAD_REF='${HEAD_REF:-<unset>}'" >&2
+				echo "Debug: tags=$(git tag --list | head -n 20 | tr '\n' ' ' 2>/dev/null || echo '<none>')" >&2
+				exit 1
+			fi
 		fi
 
 		if [ -z "${v_extra}" ]; then
