@@ -172,7 +172,7 @@ private:
 				bool bitrate_switch);
 
 	/* Template implementations for write/writeFD */
-	template <typename MsgType> int _write_impl(MsgType const &msg, bool blocking);
+	template <typename MsgType> int _write_impl(MsgType const &msg);
 
 	/* Template implementations for read/readFD */
 	template <typename MsgType> bool _read_impl(MsgType &msg);
