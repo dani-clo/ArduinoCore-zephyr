@@ -59,6 +59,13 @@ public:
 	virtual void begin();
 	virtual void end();
 
+	/*
+	 * Switch to the alternate pin routing ("alt" pinctrl state), if defined for this bus in
+	 * devicetree. No-op if the board/pins do not define one.
+	 *
+	 */
+	void beginAlternatePins();
+
 private:
 	int transfer(void *buf, size_t len, const struct spi_config *config);
 

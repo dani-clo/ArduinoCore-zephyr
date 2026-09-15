@@ -7,9 +7,11 @@
 &i2c4 {
 	status = "okay";
 	zephyr,deferred-init;
-	pinctrl-0 = <&i2c4_scl_pd12 &i2c4_sda_pd13>;
-	pinctrl-1 = <&i2c4_scl_pf14 &i2c4_sda_pf15>;
-	pinctrl-names = "default", "sleep"; /* TODO: sleep is jmisc mux */
+	pinctrl-0 = <>;
+	pinctrl-1 = <>;
+	pinctrl-2 = <&i2c4_scl_pd12 &i2c4_sda_pd13>;
+	pinctrl-3 = <&i2c4_scl_pf14 &i2c4_sda_pf15>; /* alt: JMISC connector */
+	pinctrl-names = "default", "sleep", "arduino", "alt";
 	clock-frequency = <I2C_BITRATE_FAST>;
 
 /*
@@ -243,6 +245,11 @@
 
 &spi2 {
 	zephyr,deferred-init;
+	pinctrl-0 = <>;
+	pinctrl-1 = <>;
+	pinctrl-2 = <&spi2_sck_pb13 &spi2_miso_pb14 &spi2_mosi_pb15 &spi2_nss_pb9>;
+	pinctrl-3 = <&spi2_sck_pd1 &spi2_miso_pc2 &spi2_mosi_pc3 &spi2_nss_pb9>; /* alt: ICSP connector */
+	pinctrl-names = "default", "sleep", "arduino", "alt";
 };
 
 &i2c2 {

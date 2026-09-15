@@ -134,6 +134,21 @@ void arduino::ZephyrSPI::end() {
 #endif
 }
 
+void arduino::ZephyrSPI::beginAlternatePins() {
+#if defined(CONFIG_BOARD_ARDUINO_NANO_CONNECT)
+	/* On nano_connect the SPI driver is already initialized by the loader;
+	 * calling init() again on an already-ready device hangs. */
+	if (!device_is_ready(spi_dev)) {
+		(void)zephyr::arduino::init_dev_apply_alt_pinctrl(spi_dev);
+	}
+#else
+	/* Re-apply ALT pinctrl state so shared pins
+	 * are remuxed back to SPI after other peripherals have used them.
+	 */
+	(void)zephyr::arduino::init_dev_apply_alt_pinctrl(spi_dev);
+#endif
+}
+
 #if DT_NODE_HAS_PROP(DT_PATH(zephyr_user), spis)
 #if (DT_PROP_LEN(DT_PATH(zephyr_user), spis) > 1)
 #define ARDUINO_SPI_DEFINED_0 1

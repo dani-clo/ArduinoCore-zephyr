@@ -146,6 +146,14 @@ public:
 	 */
 	int addReceiveFilter(uint32_t id, uint32_t mask, bool extended = false);
 
+	/*
+	 * Switch to the alternate pin routing ("alt" pinctrl state), if defined for this bus in
+	 * devicetree. No-op if the board/pins do not define one.
+	 */
+	bool beginAlternatePins(CanBitRate can_bitrate);
+	bool beginFDAlternatePins(CanBitRate arbitration_bitrate, uint32_t data_bitrate,
+							  bool bitrate_switch = true);
+
 private:
 	const struct device *_dev;
 	int _filter_id_std;

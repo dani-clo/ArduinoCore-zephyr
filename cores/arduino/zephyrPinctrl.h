@@ -13,6 +13,7 @@ namespace arduino {
 
 int init_dev_apply_channel_pinctrl(const struct device *dev, size_t state_pin_idx);
 int init_dev_apply_pinctrl(const struct device *dev);
+int init_dev_apply_alt_pinctrl(const struct device *dev);
 
 /*
  * Resolve pin index in a device ARDUINO pinctrl state from a DT spec array.

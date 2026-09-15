@@ -30,6 +30,13 @@ public:
 	virtual void begin(uint8_t address);
 	virtual void setClock(uint32_t freq);
 
+	/*
+	 * Switch to the alternate pin routing ("alt" pinctrl state), if defined for this bus in
+	 * devicetree. No-op if the board/pins do not define one.
+	 *
+	 */
+	void beginAlternatePins();
+
 	virtual void beginTransmission(uint8_t address);
 	virtual uint8_t endTransmission(bool stopBit);
 	virtual uint8_t endTransmission(void);

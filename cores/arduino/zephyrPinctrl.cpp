@@ -68,9 +68,9 @@ static const struct pinctrl_dev_config *get_known_pcfg(const struct device *dev)
 	return nullptr;
 }
 
-static int init_device_with_dependencies(const struct device *dev) {
+static int init_device_with_dependencies(const struct device *dev, uint8_t state_id) {
 #if defined(CONFIG_DEVICE_DEPS)
-	// Recurse on all dependencies
+	// Recurse on all dependencies, always bringing them up in their own DEFAULT state.
 	size_t handle_count = 0;
 	const device_handle_t *handles = device_required_handles_get(dev, &handle_count);
 	if (handles != nullptr) {
@@ -79,7 +79,7 @@ static int init_device_with_dependencies(const struct device *dev) {
 			if (dep_dev == nullptr) {
 				continue;
 			}
-			int ret = init_device_with_dependencies(dep_dev);
+			int ret = init_device_with_dependencies(dep_dev, PINCTRL_STATE_DEFAULT);
 			if (ret < 0) {
 				return ret;
 			}
@@ -97,11 +97,21 @@ static int init_device_with_dependencies(const struct device *dev) {
 
 	/*
 	 * If the device is without pinctrl or pinctrl_apply_state returns -ENOENT because no pins where
-	 * defined in PINCTRL_STATE_DEFAULT this should not be treated as an error, so just continue.
+	 * defined in the requested state this should not be treated as an error, so just continue.
 	 */
 	const struct pinctrl_dev_config *pcfg = get_known_pcfg(dev);
 	if (pcfg != nullptr) {
-		int ret = pinctrl_apply_state(pcfg, PINCTRL_STATE_DEFAULT);
+		/* Bus nodes with ALT may keep DEFAULT empty to prevent driver initialization from
+		 * acquiring the DEFAULT pins: their full ordinary routing lives in ARDUINO.
+		 */
+		if (state_id == PINCTRL_STATE_DEFAULT) {
+			const struct pinctrl_state *state;
+			if (pinctrl_lookup_state(pcfg, PINCTRL_STATE_DEFAULT, &state) == 0 &&
+				state->pin_cnt == 0 && pinctrl_lookup_state(pcfg, PINCTRL_STATE_ALT, &state) == 0) {
+				state_id = PINCTRL_STATE_ARDUINO;
+			}
+		}
+		int ret = pinctrl_apply_state(pcfg, state_id);
 		if (ret < 0 && ret != -ENOENT) {
 			return ret;
 		}
@@ -171,14 +181,32 @@ int init_dev_apply_channel_pinctrl(const struct device *dev, size_t state_pin_id
  * Before initializing the device itself, also ensure its dependencies are initialized and apply the
  * pinctrl state to them as well if required.
  *
- * @param dev Target peripheral device to acquire pin for
+ * @param dev Target peripheral device to initialize and acquire pin for
  */
 int init_dev_apply_pinctrl(const struct device *dev) {
 	if (dev == nullptr) {
 		return -EINVAL;
 	}
 
-	return init_device_with_dependencies(dev);
+	return init_device_with_dependencies(dev, PINCTRL_STATE_DEFAULT);
+}
+
+/**
+ * @brief Optimize peripheral transitions applying pinctrl state PINCTRL_STATE_ALT
+ * (alternate peripheral pin routing), if defined.
+ * Before initializing the device itself, also ensure its dependencies are initialized and apply the
+ * pinctrl state to them as well if required.
+ *
+ * Only the target requests ALT, while dependencies request DEFAULT.
+ *
+ * @param dev Target peripheral device to initialize and mux pin to its "alt" pinctrl state.
+ */
+int init_dev_apply_alt_pinctrl(const struct device *dev) {
+	if (dev == nullptr) {
+		return -EINVAL;
+	}
+
+	return init_device_with_dependencies(dev, PINCTRL_STATE_ALT);
 }
 
 } // namespace arduino
