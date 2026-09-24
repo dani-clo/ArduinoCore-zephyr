@@ -41,7 +41,7 @@
 	};
 
 	zephyr,user {
-		serials = <&sercom1>, <&sercom6>, <&sercom0>;
+		serials = <&sercom6>, <&sercom1>, <&sercom0>;
 
 		pwm-pin-gpios = <&portc 19 0>,
 				<&portc 20 0>,

@@ -317,7 +317,8 @@
 					    <&portd 12 0>,  /* D29 */
 					    <&portc 14 0>,  /* D30 */
 					    <&portd 16 0>,  /* D31 */
-					    <&portd 14 0>;  /* D32 */
+					    <&portd 14 0>,  /* D32 */
+						<&portd 13 0>;  /* D33 */
 
 		builtin-led-gpios = <&portb 16 0>,
 					    <&portc 15 0>,
