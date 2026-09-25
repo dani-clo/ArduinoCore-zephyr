@@ -754,9 +754,9 @@ nano_chandler.build.board=NANO_CHANDLER
 #
 # Multi-image MCUboot: no combined bundle, so build.ota.magic is unset and
 # postobjcopy.3/.4 (bundle/delta generation) are effectively no-ops.
-# build.ota.offset is kept for reference (sketch partition at 0x48000).
+# build.ota.offset is kept for reference (sketch partition at 0x50000).
 nano_chandler.build.ota.magic=
-nano_chandler.build.ota.offset=0x48000
+nano_chandler.build.ota.offset=0x50000
 nano_chandler.build.ota.mcuboot_args=
 
 nano_chandler.vid.0=0x2341
@@ -839,7 +839,7 @@ nano_chandler_monica.build.zephyr_target=arduino_nano_chandler
 # EXTRA_DTC_OVERLAY_FILE is applied after DTC_OVERLAY_FILE - and after the
 # shield - so it is the only place the carrier can override the bare module.
 # Paths are relative to the 'loader' application directory, like debug.conf.
-nano_chandler_monica.build.zephyr_args=--shield nano_chandler_monica -- -DEXTRA_CONF_FILE=../variants/arduino_nano_chandler_pic32ck1025gc01144/monica.conf -DEXTRA_DTC_OVERLAY_FILE=../variants/arduino_nano_chandler_pic32ck1025gc01144/monica.overlay
+nano_chandler_monica.build.zephyr_args=--shield nano_chandler_monica -- -DCMAKE_PROJECT_app_INCLUDE=../variants/arduino_nano_chandler_pic32ck1025gc01144/monica.cmake -DEXTRA_CONF_FILE=../variants/arduino_nano_chandler_pic32ck1025gc01144/monica.conf -DEXTRA_DTC_OVERLAY_FILE=../variants/arduino_nano_chandler_pic32ck1025gc01144/monica.overlay
 nano_chandler_monica.build.zephyr_hals=hal_microchip
 nano_chandler_monica.build.zephyr_toolchain=arm-zephyr-eabi
 nano_chandler_monica.build.artifact=zephyr_main
@@ -850,13 +850,10 @@ nano_chandler_monica.build.variant=arduino_nano_chandler_monica_pic32ck1025gc011
 nano_chandler_monica.build.extra_flags=
 nano_chandler_monica.build.board=NANO_CHANDLER_MONICA
 
-# OTA: same layout as the bare module (they share the variant and its partition
-# table), only the magic differs - it follows the carrier's own USB PID.
-# Monica's loader is ~281K of the 288K available before the sketch offset,
-# because it carries the WiFi stack too; if it grows past that, the sketch build
-# fails with "loader exceeds offset".
+# Shared Nano Chandler / Monica layout: 320 KiB loader, 696 KiB sketch.
+# MCUboot must use the matching partition layout.
 nano_chandler_monica.build.ota.magic=
-nano_chandler_monica.build.ota.offset=0x48000
+nano_chandler_monica.build.ota.offset=0x50000
 nano_chandler_monica.build.ota.mcuboot_args=
 
 nano_chandler_monica.vid.0=0x2341
@@ -901,4 +898,3 @@ nano_chandler_monica.bootloader.address=0x0C000000
 # The artifact is the MCUboot-headered image, a raw binary, so pyocd needs the
 # address (see bootloader.load_at in platform.txt).
 nano_chandler_monica.bootloader.load_at=@{bootloader.address}
-

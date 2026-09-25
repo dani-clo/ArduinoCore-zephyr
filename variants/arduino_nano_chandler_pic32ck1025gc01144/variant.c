@@ -26,7 +26,7 @@
 
 BUILD_ASSERT(SLOT_ABS(slot0_partition) == 0x0C000000,
 	     "slot0 moved: keep this overlay and mcuboot.overlay in sync");
-BUILD_ASSERT(SLOT_ABS(user_sketch) == 0x0C048000,
+BUILD_ASSERT(SLOT_ABS(user_sketch) == 0x0C050000,
 	     "user_sketch moved: keep this overlay and mcuboot.overlay in sync");
 BUILD_ASSERT(SLOT_ABS(user_sketch) == SLOT_ABS(slot0_partition) + DT_REG_SIZE(DT_NODELABEL(slot0_partition)),
 	     "user_sketch must start immediately after slot0");

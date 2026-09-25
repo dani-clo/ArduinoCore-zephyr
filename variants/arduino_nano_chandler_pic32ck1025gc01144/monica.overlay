@@ -23,6 +23,10 @@
 
 #include <zephyr/dt-bindings/pwm/pwm.h>
 
+&trng {
+	status = "okay";
+};
+
 /*
  * UART1 (sercom1) is hard-wired on this carrier to the ESP8266 WiFi module's
  * AT-command UART (via 0R bridge resistors) - it can no longer double as a
@@ -53,6 +57,7 @@
 
 / {
 	chosen {
+		zephyr,entropy = &trng;
 		zephyr,console = &sercom6;
 		zephyr,shell-uart = &sercom6;
 	};

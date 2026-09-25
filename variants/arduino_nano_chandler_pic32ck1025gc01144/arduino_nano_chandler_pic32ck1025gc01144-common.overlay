@@ -237,8 +237,8 @@
  * Upgrade-only (no swap): slot1 is a staging area for sketch deltas and
  * bootloader self-updates, not an A/B swap target.
  *
- *   0x0C000000  288K   slot0 (image-0)  loader
- *   0x0C048000  728K   slot2 (image-2)  sketch (raw zsk/ELF, no MCUboot header)
+ *   0x0C000000  320K   slot0 (image-0)  loader
+ *   0x0C050000  696K   slot2 (image-2)  sketch (raw zsk/ELF, no MCUboot header)
  *                     ----
  *                     1016K used; last 8K is dummy secondaries (MCUboot only)
  *
@@ -257,7 +257,7 @@
  * Integrity is the host's responsibility — a corrupt upload is caught by the
  * loader's sketch header validation, not by MCUboot.
  *
- * The sketch ceiling is 728K. Measured sketches are ~24K. upload.maximum_size
+ * The sketch ceiling is 696K. Measured sketches are ~24K. upload.maximum_size
  * follows automatically: extra/build.sh derives it from this table into
  * boards.local.txt, which is generated - do not edit it by hand.
  */
@@ -271,13 +271,13 @@
 
 		slot0_partition: image_0: partition@0 {
 			label = "image-0";
-			reg = <0x0 DT_SIZE_K(288)>;
+			reg = <0x0 DT_SIZE_K(320)>;
 		};
 
 		/* Image 1: the sketch's own partition, no longer inside slot0. */
-		user_sketch: partition@48000 {
+		user_sketch: partition@50000 {
 			label = "user_sketch";
-			reg = <0x48000 DT_SIZE_K(728)>;
+			reg = <0x50000 DT_SIZE_K(696)>;
 		};
 
 	};
