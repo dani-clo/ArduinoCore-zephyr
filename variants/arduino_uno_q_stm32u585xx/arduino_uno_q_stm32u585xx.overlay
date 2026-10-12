@@ -110,24 +110,17 @@
 		zephyr,deferred-init;
 		pinctrl-0 = <>;
 		pinctrl-1 = <>;
-		pinctrl-2 = <&tim1_ch4_pa11 &tim1_ch3n_pb15 &tim1_ch1n_pb13 &tim1_ch2n_pb14>;
+		pinctrl-2 = <&tim1_ch3n_pb15 &tim1_ch1n_pb13 &tim1_ch2n_pb14>;
 		pinctrl-names = "default", "sleep", "arduino";
 	};
 };
 
-/* Currently only the pins marked with ~ on the pin headers are enabled */
-/* PB10 and PB11 conflict with I2C configuation */
+/* TIM2 is reserved for CANnectivity timestamps (32 bit at 1 MHz). */
 &timers2 {
-	status = "okay";
-	st,prescaler = <4>;
+	st,prescaler = <159>;
 
-	pwm2: pwm {
-		status = "okay";
-		zephyr,deferred-init;
-		pinctrl-0 = <>;
-		pinctrl-1 = <>;
-		pinctrl-2 = <&tim2_ch2_pb3 &tim2_ch3_pb10 &tim2_ch4_pb11>;
-		pinctrl-names = "default", "sleep", "arduino";
+	pwm {
+		status = "disabled";
 	};
 };
 
@@ -145,17 +138,13 @@
 	};
 };
 
+/* D9/D10 are reserved for CAN. */
 &timers4 {
-	status = "okay";
+	status = "disabled";
 	st,prescaler = <4>;
 
-	pwm4: pwm {
-		status = "okay";
-		zephyr,deferred-init;
-		pinctrl-0 = <>;
-		pinctrl-1 = <>;
-		pinctrl-2 = <&tim4_ch3_pb8 &tim4_ch4_pb9 /*&tim4_ch1_pb6 &tim4_ch2_pb7*/>;
-		pinctrl-names = "default", "sleep", "arduino";
+	pwm {
+		status = "disabled";
 	};
 };
 
@@ -232,16 +221,14 @@
              <&rcc STM32_SRC_LSE RTC_SEL(1)>;
 };
 
+/* Inherit the board CAN pins PB8/PB9; initialize before gs_usb registration. */
 &fdcan1 {
-	status = "okay";
-	zephyr,deferred-init;
-	pinctrl-0 = <&fdcan1_rx_pa11 &fdcan1_tx_pa12>;
-	pinctrl-names = "default";
-	clocks = <&rcc STM32_CLOCK_BUS_APB1_2 0x00000200>,
-		 <&rcc STM32_SRC_PLL1_Q FDCAN1_SEL(1)>;
+	/delete-property/ zephyr,deferred-init;
 };
 
 &spi2 {
+	/* PB9 is reserved for CAN TX; chip select is controlled by software. */
+	pinctrl-0 = <&spi2_sck_pb13 &spi2_miso_pb14 &spi2_mosi_pb15>;
 	zephyr,deferred-init;
 };
 
@@ -272,6 +259,20 @@
 };
 
 / {
+	gs_usb0: gs_usb0 {
+		compatible = "gs_usb";
+	};
+
+	cannectivity: cannectivity {
+		compatible = "cannectivity";
+		timestamp-counter = <&counter0>;
+
+		channel0 {
+			compatible = "cannectivity-channel";
+			can-controller = <&fdcan1>;
+		};
+	};
+
 	zephyr,user {
 		digital-pin-gpios = <&gpiob 7 GPIO_ACTIVE_HIGH>, /* D0 - PB7 */
 				    <&gpiob 6 GPIO_ACTIVE_HIGH>, /* D1 - PB6 */
@@ -363,19 +364,13 @@
 		pwm-pin-gpios =	
 				/*<&gpiob 7 0>,*/    /* D0/PB6 - TIM4_CH2 */
 				/*<&gpiob 6 0>,*/    /* D1/PB6 - TIM4_CH1 */
-				<&gpiob 3 0>,    /* D2/PB3 - TIM2_CH2 */
 				<&gpiob 0 0>,    /* D3/PB0 - TIM3_CH3 */
-				<&gpioa 11 0>,   /* D5/PA11 - TIM1_CH4 */
 				<&gpiob 1 0>,    /* D6/PB1 - TIM3_CH4 */
 				<&gpiob 2 0>,    /* D7/PB2 - TIM8_CH4N */
 				<&gpiob 4 0>,    /* D8/PB4 - TIM3_CH1 */
-				<&gpiob 8 0>,    /* D9/PB8 - TIM4_CH3 */
-				<&gpiob 9 0>,    /* D10/PB9 - TIM4_CH4 */
 				<&gpiob 15 0>,   /* D11/PB15 - TIM1_CH3N */
 				<&gpiob 14 0>,   /* D12/PB14 - TIM1_CH2N */
 				<&gpiob 13 0>,   /* D13/PB13 - TIM1_CH1N */
-				<&gpiob 11 0>,   /* D20/PB11 - TIM2_CH4 */
-				<&gpiob 10 0>,   /* D21/PB10 - TIM2_CH3 */
 				<&gpioh 10 0>,   /* LED3_R - TIM5_CH1 */
 				<&gpioh 11 0>,   /* LED3_G - TIM5_CH2 */
 				<&gpioh 12 0>;   /* LED3_B - TIM5_CH3 */
@@ -397,19 +392,13 @@
 		pwms = 
 		       /*<&pwm4 2 PWM_HZ(500) PWM_POLARITY_NORMAL>,*/   /* D0/PB7 → TIM4_CH2 */
 		       /*<&pwm4 1 PWM_HZ(500) PWM_POLARITY_NORMAL>,*/   /* D1/PB6 → TIM4_CH1 */
-		       <&pwm2 2 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D2/PB3 → TIM2_CH2 */
 		       <&pwm3 3 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D3/PB0 → TIM3_CH3 */
-		       <&pwm1 4 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D5/PA11 → TIM1_CH4 */
 		       <&pwm3 4 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D6/PB1 → TIM3_CH4 */
 		       <&pwm8 4 PWM_HZ(500) (PWM_POLARITY_NORMAL | STM32_PWM_COMPLEMENTARY)>, /* D7/PB2 → TIM8_CH4N */
 		       <&pwm3 1 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D8/PB4 → TIM3_CH1 */
-		       <&pwm4 3 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D9/PB8 → TIM4_CH3 */
-		       <&pwm4 4 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D10/PB9 → TIM4_CH4 */
 		       <&pwm1 3 PWM_HZ(500) (PWM_POLARITY_NORMAL | STM32_PWM_COMPLEMENTARY)>, /* D11/PB15 → TIM1_CH3N */
 		       <&pwm1 2 PWM_HZ(500) (PWM_POLARITY_NORMAL | STM32_PWM_COMPLEMENTARY)>, /* D12/PB14 → TIM1_CH2N */
 		       <&pwm1 1 PWM_HZ(500) (PWM_POLARITY_NORMAL | STM32_PWM_COMPLEMENTARY)>, /* D13/PB13 → TIM1_CH1N */
-		       <&pwm2 4 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D20/PB11 → TIM2_CH4 */
-		       <&pwm2 3 PWM_HZ(500) PWM_POLARITY_NORMAL>,   /* D21/PB10 → TIM2_CH3 */
 		       <&pwm5 1 PWM_HZ(500) PWM_POLARITY_INVERTED>,   /* LED3_R/PH10 → TIM5_CH1 */
 		       <&pwm5 2 PWM_HZ(500) PWM_POLARITY_INVERTED>,   /* LED3_G/PH11 → TIM5_CH2 */
 		       <&pwm5 3 PWM_HZ(500) PWM_POLARITY_INVERTED>;   /* LED3_B/PH12 → TIM5_CH3 */
