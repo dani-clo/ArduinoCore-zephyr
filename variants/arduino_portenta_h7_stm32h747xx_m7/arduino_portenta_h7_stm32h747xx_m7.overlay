@@ -168,6 +168,18 @@
 	status = "okay";
 };
 
+&mac {
+	zephyr,deferred-init;
+};
+
+&mdio {
+	zephyr,deferred-init;
+};
+
+&eth_phy {
+	zephyr,deferred-init;
+};
+
 &dmamux1 {
 	status = "okay";
 };
@@ -320,7 +332,6 @@
 		zephyr,cdc-acm-uart0 = &usart1;
 		zephyr,log-uart = &log_uarts;
 		arduino,camera-clock = &pwmclock;
-		arduino,eth-clock = &pwmclock;
 	};
 
 	log_uarts: log_uarts {
