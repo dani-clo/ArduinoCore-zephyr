@@ -41,8 +41,8 @@ void loop() {
 #include "Arduino_Video.h"
 
 // Capture settings.
-constexpr int CAMERA_WIDTH  = 320;
-constexpr int CAMERA_HEIGHT = 240;
+constexpr int CAMERA_WIDTH  = 640;
+constexpr int CAMERA_HEIGHT = 480;
 
 // Two or more buffers means no tearing, one means the frame is drawn into the
 // buffer being scanned out. Zero means the application owns them, unsupported.
@@ -119,16 +119,16 @@ static void rotate_and_scale(const uint16_t *src, uint16_t *dst) {
 void setup(void) {
   Serial.begin(115200);
 
+  if (Display.begin() != 0) {
+    fatal_error("Display initialization failed");
+  }
+
   if (!cam.begin(CAMERA_WIDTH, CAMERA_HEIGHT, CAMERA_RGB565, true)) {
     fatal_error("Camera begin failed");
   }
 
   cam.setVerticalFlip(false);
   cam.setHorizontalMirror(false);
-
-  if (Display.begin() != 0) {
-    fatal_error("Display initialization failed");
-  }
 
   display_width = Display.width();
   display_height = Display.height();

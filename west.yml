@@ -17,11 +17,13 @@ manifest:
       url-base: https://github.com/facchinm
     - name: pillo79
       url-base: https://github.com/pillo79
+    - name: dani-clo
+      url-base: https://github.com/dani-clo
 
   projects:
     - name: zephyr
-      remote: arduino
-      revision: zephyr-arduino-v4.4.2
+      remote: dani-clo
+      revision: stm32_dcmi_gc2145
       import:
         name-allowlist:
           - cmsis
