@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <zephyr/kernel.h>
+#include <zephyr/version.h>
 #include <time.h>
 #include <sys/time.h>
 #include <zephyr/drivers/pinctrl.h>
@@ -180,7 +181,10 @@ FORCE_EXPORT_SYM(net_if_ipv4_maddr_add);
 FORCE_EXPORT_SYM(net_if_ipv4_maddr_join);
 FORCE_EXPORT_SYM(net_if_ipv4_set_gw);
 FORCE_EXPORT_SYM(net_if_ipv4_addr_add);
+#if ZEPHYR_VERSION_CODE < ZEPHYR_VERSION(4, 4, 99)
+/* Removed upstream; net_if_ipv4_set_netmask_by_addr() replaces it */
 FORCE_EXPORT_SYM(net_if_ipv4_set_netmask);
+#endif
 FORCE_EXPORT_SYM(net_if_ipv4_set_netmask_by_addr);
 #endif
 FORCE_EXPORT_SYM(net_if_lookup_by_dev);
@@ -474,7 +478,10 @@ FORCE_EXPORT_SYM(flash_area_open);
 FORCE_EXPORT_SYM(flash_area_read);
 FORCE_EXPORT_SYM(flash_area_write);
 FORCE_EXPORT_SYM(flash_area_erase);
+#if ZEPHYR_VERSION_CODE < ZEPHYR_VERSION(4, 4, 99)
+/* An empty static inline upstream, nothing left to export */
 FORCE_EXPORT_SYM(flash_area_close);
+#endif
 #endif
 
 #if defined(CONFIG_FILE_SYSTEM)
