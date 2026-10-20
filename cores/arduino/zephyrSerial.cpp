@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <zephyr/version.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/uart.h>
 
@@ -79,9 +80,14 @@ void arduino::ZephyrSerial::IrqHandler() {
 	int length;
 	int ret = 0;
 
+#if ZEPHYR_VERSION_CODE < ZEPHYR_VERSION(4, 4, 99)
 	if (!uart_irq_update(uart)) {
 		return;
 	}
+#else
+	/* Returns void upstream; there is nothing to bail out on */
+	uart_irq_update(uart);
+#endif
 
 	k_sem_take(&rx.sem, K_NO_WAIT);
 	while (uart_irq_rx_ready(uart) && ((length = uart_fifo_read(uart, buf, sizeof(buf))) > 0)) {
