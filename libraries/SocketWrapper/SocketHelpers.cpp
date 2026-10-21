@@ -153,14 +153,14 @@ void NetworkInterface::setLocalIP(const IPAddress ip) {
 }
 
 void NetworkInterface::setSubnetMask(const IPAddress subnet) {
+	struct in_addr addr;
 	struct in_addr netmask_addr;
+	addr.s_addr = localIP();
 	netmask_addr.s_addr = subnet;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-	// TODO: store the address that was manually set and replace this call
-	// with net_if_ipv4_set_netmask_by_addr
-	net_if_ipv4_set_netmask(netif, &netmask_addr);
-#pragma GCC diagnostic pop
+	if (!net_if_ipv4_set_netmask_by_addr(netif, &addr, &netmask_addr)) {
+		LOG_ERR("Failed to set subnet mask");
+		return;
+	}
 	LOG_INF("Subnet mask set: %s", subnet.toString().c_str());
 	return;
 }
