@@ -8,7 +8,7 @@
  * Nano XL Link "Monica" carrier - devicetree delta.
  *
  * Monica is not a Zephyr board variant: it is the plain arduino_nano_xl_link
- * board plus the "nano_xl_link_monica" shield. Zephyr applies overlays in the
+ * board plus the "arduino_nano_xl_link_monica" shield. Zephyr applies overlays in the
  * order
  *
  *     board .dts -> shield overlays -> DTC_OVERLAY_FILE -> EXTRA_DTC_OVERLAY_FILE

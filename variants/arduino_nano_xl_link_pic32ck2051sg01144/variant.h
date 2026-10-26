@@ -13,7 +13,7 @@
 /*
  * This variant is shared by two boards.txt entries: the bare 'nanoxllink'
  * module and 'nanoxllink_monica', which is the same board plus the
- * "nano_xl_link_monica" shield. On the carrier, sercom1 is dedicated to the
+ * "arduino_nano_xl_link_monica" shield. On the carrier, sercom1 is dedicated to the
  * ESP8266 AT UART and is dropped from the "serials" list, so every Serial
  * object shifts down by one: RS485 (sercom0) is Serial3 on the bare module and
  * Serial2 on Monica. ARDUINO_NANO_XL_LINK_MONICA comes from the board's
