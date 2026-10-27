@@ -21,6 +21,19 @@ if(SB_CONFIG_BOOTLOADER_MCUBOOT)
   endif()
 endif()
 
+# MCUboot starts the watchdog with the variant's timeout, the loader feeds it
+if(SB_CONFIG_ENFORCE_SECURE_WATCHDOG)
+  set_config_bool(mcuboot CONFIG_WATCHDOG y)
+  set_config_bool(mcuboot CONFIG_BOOT_WATCHDOG_SETUP_AT_BOOT y)
+  set_config_bool(mcuboot CONFIG_BOOT_WATCHDOG_INSTALL_TIMEOUT_AT_BOOT y)
+  set_config_bool(mcuboot CONFIG_BOOT_USB_DFU_AVOID_WATCHDOG y)
+  set_config_int(mcuboot CONFIG_BOOT_WATCHDOG_TIMEOUT_MS ${SB_CONFIG_SECURE_WATCHDOG_TIMEOUT_MS})
+
+  set_config_bool(${DEFAULT_IMAGE} CONFIG_WATCHDOG y)
+  set_config_bool(${DEFAULT_IMAGE} CONFIG_APP_WATCHDOG_ENFORCED y)
+  set_config_int(${DEFAULT_IMAGE} CONFIG_APP_WATCHDOG_TIMEOUT_MS ${SB_CONFIG_SECURE_WATCHDOG_TIMEOUT_MS})
+endif()
+
 # Boards with a separate bootloader also get the bootloader updater, uploaded
 # by the 'Zephyr burner app' programmer in place of the loader. It is linked where
 # the loader lives, so it is only built and never flashed by 'west flash'.

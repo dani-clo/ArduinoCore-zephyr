@@ -1,0 +1,13 @@
+# loader/Kconfig.sysbuild
+
+source "share/sysbuild/Kconfig"
+
+config ENFORCE_SECURE_WATCHDOG
+    bool "Enforce hardware watchdog at boot"
+    depends on BOOTLOADER_MCUBOOT
+    default y
+
+config SECURE_WATCHDOG_TIMEOUT_MS
+    int "Watchdog timeout in milliseconds"
+    depends on ENFORCE_SECURE_WATCHDOG
+    default 20000
