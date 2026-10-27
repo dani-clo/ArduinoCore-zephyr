@@ -235,7 +235,7 @@ bool ZephyrSocketWrapper::connectSSL(const char *host, uint16_t port, const char
 	}
 
 	if (setsockopt(*sock_fd, SOL_TLS, TLS_HOSTNAME, host, strlen(host)) ||
-		setsockopt(*sock_fd, SOL_TLS, TLS_SEC_TAG_LIST, sec_tag_opt, sizeof(sec_tag_opt)) ||
+		setsockopt(*sock_fd, SOL_TLS, TLS_SEC_TAG_LIST, sec_tag_opt, tag_count * sizeof(sec_tag_t)) ||
 		setsockopt(*sock_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout_opt, sizeof(timeout_opt))) {
 		goto exit;
 	}
@@ -253,7 +253,7 @@ exit:
 		res = nullptr;
 	}
 
-	if (!rv && *sock_fd >= 0) {
+	if (!rv && sock_fd) {
 		sock_fd = nullptr;
 	}
 	return rv;
