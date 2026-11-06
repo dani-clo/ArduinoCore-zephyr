@@ -82,6 +82,7 @@ func main() {
 	var pem_file = flag.String("pem_file", "", "Path to the PEM file containing keys")
 	var erase_flash_dim = flag.Uint("erase_flash_dim", 0, "Minimum erasing flash sector dimension in bytes")
 	var image_version = flag.String("image_version", "1.0.0.0", "Image version for the header (default 1.0.0.0)")
+	var dfu_offset = flag.Uint("dfu_offset", 0, "[squash] Also write a .signed.dfu copy starting with this many 0xFF bytes")
 
 	cli.ParseFlags()
 
@@ -98,7 +99,7 @@ func main() {
 			cli.Fatal("-loader_bin is required with -squash")
 		}
 		fmt.Printf("Running squash process without a sketch file.\n")
-		signAndSquash(*loader_bin, "", *pem_file, *erase_flash_dim, *image_version)
+		signAndSquash(*loader_bin, "", *pem_file, *erase_flash_dim, *image_version, 0)
 		return
 	}
 
@@ -197,7 +198,7 @@ func main() {
 		if *loader_bin == "" {
 			cli.Fatal("-loader_bin is required with -squash")
 		}
-		signAndSquash(*loader_bin, newFilename, *pem_file, *erase_flash_dim, *image_version)
+		signAndSquash(*loader_bin, newFilename, *pem_file, *erase_flash_dim, *image_version, *dfu_offset)
 	}
 }
 
@@ -217,7 +218,7 @@ func main() {
  *  Depending on CONFIG PARAMETER of the variants the padding is automatically
  *  added
  */
-func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, eraseFlashDim uint, versionStr string) {
+func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, eraseFlashDim uint, versionStr string, dfuOffset uint) {
 	fmt.Printf("\n--- Starting Squash & Sign Process ---\n")
 	var config_file string = "undefined"
 	var dts_file string = "undefined"
@@ -454,6 +455,20 @@ func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, e
 
 	fmt.Println("   === IMAGE built and signed successfully")
 	fmt.Printf("   === Output file: %s\n", output_file)
+
+	/*
+	 * MCUboot swap-using-offset expects an update one sector into the
+	 * secondary slot, but its USB DFU writes the download from the start of
+	 * the slot: give DFU a copy with that sector left erased in front.
+	 */
+	if dfuOffset > 0 && sketchBinFile != "" {
+		dfuImg := append(bytes.Repeat([]byte{0xFF}, int(dfuOffset)), finalImg.Bytes()...)
+		dfuFile := strings.Replace(output_file, ".signed.", ".signed.dfu.", 1)
+		if err := os.WriteFile(dfuFile, dfuImg, 0644); err != nil {
+			log.Fatalf("Failed to write DFU file(%s), error %v", dfuFile, err)
+		}
+		fmt.Printf("   === DFU file: %s\n", dfuFile)
+	}
 }
 
 func parseVersionString(ver string) ImageVersion {
