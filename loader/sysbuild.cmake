@@ -58,3 +58,8 @@ if(SB_CONFIG_BOOTLOADER_MCUBOOT)
   set_property(TARGET burner APPEND PROPERTY IMAGE_CONF_SCRIPT
     ${ZEPHYR_BASE}/share/sysbuild/image_configurations/MAIN_image_default.cmake)
 endif()
+
+# MCUboot hooks shared by the variants; built only when a variant's
+# mcuboot.conf sets CONFIG_BOOT_IMAGE_ACCESS_HOOKS.
+set(mcuboot_EXTRA_ZEPHYR_MODULES ${APP_DIR}/mcuboot_hooks
+    CACHE INTERNAL "Arduino MCUboot hooks")
