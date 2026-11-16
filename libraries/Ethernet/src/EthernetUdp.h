@@ -7,6 +7,6 @@
 #pragma once
 #include <ZephyrUDP.h>
 
-#if DT_HAS_COMPAT_STATUS_OKAY(ethernet_phy) || DT_HAS_COMPAT_STATUS_OKAY(microchip_ksz8081)
+#if defined(CONFIG_NET_L2_ETHERNET)
 using EthernetUDP = ZephyrUDP;
 #endif
