@@ -26,7 +26,6 @@ if(SB_CONFIG_ENFORCE_SECURE_WATCHDOG)
   set_config_bool(mcuboot CONFIG_WATCHDOG y)
   set_config_bool(mcuboot CONFIG_BOOT_WATCHDOG_SETUP_AT_BOOT y)
   set_config_bool(mcuboot CONFIG_BOOT_WATCHDOG_INSTALL_TIMEOUT_AT_BOOT y)
-  set_config_bool(mcuboot CONFIG_BOOT_USB_DFU_AVOID_WATCHDOG y)
   set_config_int(mcuboot CONFIG_BOOT_WATCHDOG_TIMEOUT_MS ${SB_CONFIG_SECURE_WATCHDOG_TIMEOUT_MS})
 
   set_config_bool(${DEFAULT_IMAGE} CONFIG_WATCHDOG y)
@@ -59,7 +58,7 @@ if(SB_CONFIG_BOOTLOADER_MCUBOOT)
     ${ZEPHYR_BASE}/share/sysbuild/image_configurations/MAIN_image_default.cmake)
 endif()
 
-# MCUboot hooks shared by the variants; built only when a variant's
-# mcuboot.conf sets CONFIG_BOOT_IMAGE_ACCESS_HOOKS.
+# MCUboot hooks shared by the variants (DFU boot mode, update policy);
+# each is built only when the board's MCUboot configuration turns it on.
 set(mcuboot_EXTRA_ZEPHYR_MODULES ${APP_DIR}/mcuboot_hooks
     CACHE INTERNAL "Arduino MCUboot hooks")
