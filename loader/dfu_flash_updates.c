@@ -82,9 +82,14 @@ static void retrieve_flash_info(void) {
 	flash_area_close(fa);
 }
 
-/* The .dfu file starts one erased sector early (zsk --dfu_offset 4096). */
-#define XL_IMAGE_OFFSET 0x1000
-#define XL_IMAGE_MAGIC  0x96f3b83dU /* MCUboot image header */
+/* Swap-using-offset DFU files include the secondary slot's first sector. */
+#if defined(CONFIG_MCUBOOT_BOOTLOADER_MODE_SWAP_USING_OFFSET)
+#define DFU_IMAGE_OFFSET DT_PROP(DT_MTD_FROM_FIXED_PARTITION(DT_NODELABEL(slot1_partition)), \
+				 erase_block_size)
+#else
+#define DFU_IMAGE_OFFSET 0
+#endif
+#define DFU_IMAGE_MAGIC 0x96f3b83dU /* MCUboot image header */
 
 /* The request is a boot-mode value; Nano XL has no retention2. */
 bool check_dfu_mode_requested(void) {
@@ -181,7 +186,7 @@ static int dfu_flash_write(void *const priv, const uint32_t block, const uint16_
 	 * into slot1 in swap-using-offset). An image without the pad is taken as is.
 	 */
 	if (block == 0) {
-		data->skip = sys_get_le32(buf) == XL_IMAGE_MAGIC ? 0 : XL_IMAGE_OFFSET;
+		data->skip = sys_get_le32(buf) == DFU_IMAGE_MAGIC ? 0 : DFU_IMAGE_OFFSET;
 	}
 	const uint16_t drop = MIN(size, data->skip);
 
@@ -316,7 +321,7 @@ static int dynamic_flash_write(void *const priv, const uint32_t block, const uin
 		LOG_ERR("Sketch shares an erase block with the loader, use complete_image");
 		return -ENOTSUP;
 	}
-	uint32_t start_offset = XL_IMAGE_OFFSET + sketch_layout.sketch_offset;
+	uint32_t start_offset = DFU_IMAGE_OFFSET + sketch_layout.sketch_offset;
 
 	err = flash_area_open(UPDATE_PARTITION_ID, &fa);
 	if (err) {
@@ -337,7 +342,7 @@ static int dynamic_flash_write(void *const priv, const uint32_t block, const uin
 
 		uint32_t sketch_total_size = sketch_layout.erase_size * sketch_layout.block_num;
 
-		if ((XL_IMAGE_OFFSET + sketch_layout.sketch_offset + sketch_total_size) > UPDATE_PARTITION_SIZE) {
+		if ((DFU_IMAGE_OFFSET + sketch_layout.sketch_offset + sketch_total_size) > UPDATE_PARTITION_SIZE) {
 			LOG_ERR("Sketch offset exceeds partition size");
 			err = -ENOSPC;
 			goto end;
@@ -361,7 +366,7 @@ static int dynamic_flash_write(void *const priv, const uint32_t block, const uin
 		}
 
 		LOG_INF("Erase header (1) 0x%08x bytes at offset 0", sketch_layout.erase_size);
-		err = flash_area_erase(fa, 0, XL_IMAGE_OFFSET + sketch_layout.erase_size);
+		err = flash_area_erase(fa, 0, DFU_IMAGE_OFFSET + sketch_layout.erase_size);
 		if (err) {
 			LOG_ERR("Flash area erase failed (%d)", err);
 			goto end;
@@ -384,9 +389,9 @@ static int dynamic_flash_write(void *const priv, const uint32_t block, const uin
 		uint32_t process_size;
 
 		/* Case 1: Header region */
-		if (data->current_offset < XL_IMAGE_OFFSET + sketch_layout.erase_size) {
+		if (data->current_offset < DFU_IMAGE_OFFSET + sketch_layout.erase_size) {
 			process_size = MIN(remaining_size,
-					   XL_IMAGE_OFFSET + sketch_layout.erase_size - data->current_offset);
+					   DFU_IMAGE_OFFSET + sketch_layout.erase_size - data->current_offset);
 			write_offset = data->current_offset;
 		}
 		/* Case 2: Gap between header and sketch (checked, see gap_flush) */

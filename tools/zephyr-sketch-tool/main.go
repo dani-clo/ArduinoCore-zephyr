@@ -57,7 +57,7 @@ const (
 )
 
 func main() {
-	var output = flag.String("output", "", "Output to a specific file (default: add -zsk.bin suffix)")
+	var output = flag.String("output", "", "Output to a specific file (also applies to signing without a sketch)")
 	var debug = flag.Bool("debug", false, "Enable debugging mode")
 	var immediate = flag.Bool("immediate", false, "Start sketch immediately [UNO Q]")
 	var wait_for_app = flag.Bool("wait_for_app", false, "Wait for the app to start [UNO Q]")
@@ -98,7 +98,7 @@ func main() {
 			return
 		}
 		fmt.Printf("Running squash process without a sketch file.\n")
-		signAndSquash(*loader_bin, "", *pem_file, *erase_flash_dim, *image_version, 0)
+		signAndSquash(*loader_bin, "", *pem_file, *erase_flash_dim, *image_version, *dfu_offset, *output)
 		return
 	}
 
@@ -198,7 +198,7 @@ func main() {
 			fmt.Printf("Error: --loader_bin is required when --squash is used.\n")
 			return
 		}
-		signAndSquash(*loader_bin, newFilename, *pem_file, *erase_flash_dim, *image_version, *dfu_offset)
+		signAndSquash(*loader_bin, newFilename, *pem_file, *erase_flash_dim, *image_version, *dfu_offset, "")
 	}
 }
 
@@ -218,7 +218,7 @@ func main() {
  *  Depending on CONFIG PARAMETER of the variants the padding is automatically
  *  added
  */
-func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, eraseFlashDim uint, versionStr string, dfuOffset uint) {
+func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, eraseFlashDim uint, versionStr string, dfuOffset uint, outputFile string) {
 	fmt.Printf("\n--- Starting Squash & Sign Process ---\n")
 	var config_file string = "undefined"
 	var dts_file string = "undefined"
@@ -252,7 +252,9 @@ func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, e
 	 * It the sketch file is not provided then a file is created in 
     * in <cache>/arduino/firmwares
     */
-	if sketchBinFile != "" {
+	if outputFile != "" {
+		output_file = outputFile
+	} else if sketchBinFile != "" {
 		output_file = AddSignedModifier(sketchBinFile);
 	} else {
 		output_loader_path, ok := OutLoaderSignedPath();
@@ -386,13 +388,24 @@ func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, e
 	}
 
 	/* CONSTRUCT IMAGE HEADER */
+	headerSize := HeaderSize
+	if value, err := GetConfigValue(config_file, "CONFIG_ROM_START_OFFSET"); err == nil {
+		size, err := strconv.ParseUint(value, 0, 16)
+		if err != nil || size < 48 {
+			log.Fatalf("Invalid MCUboot header size: %s", value)
+		}
+		headerSize = uint16(size)
+	}
+	if len(image) < int(headerSize) {
+		log.Fatal("Image is smaller than its MCUboot header")
+	}
 	imgVersion := parseVersionString(versionStr)
 	header := ImageHeader{
 		Magic:     ImageMagic,
 		LoadAddr:  0x0,
-		HdrSize:   HeaderSize,
+		HdrSize:   headerSize,
 		PTLVSize:  0,
-		ImageSize: uint32(len(image)) - uint32(HeaderSize),
+		ImageSize: uint32(len(image)) - uint32(headerSize),
 		Flags:     0x0,
 		Version:   imgVersion,
 	}
@@ -449,6 +462,9 @@ func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, e
 	if totalImageSize > SlotSize {
 		log.Fatalf("Error: Final image size (%d) exceeds the defined slot size (%d)!", totalImageSize, SlotSize)
 	}
+	if slot1_dim > 0 && uint64(totalImageSize)+uint64(dfuOffset) > uint64(slot1_dim) {
+		log.Fatalf("Error: DFU image exceeds slot1 size (%d)!", slot1_dim)
+	}
 
 	err = os.WriteFile(output_file, finalImg.Bytes(), 0644)
 	if err != nil {
@@ -463,9 +479,13 @@ func signAndSquash(loaderBinFile string, sketchBinFile string, pemFile string, e
 	 * secondary slot, but its USB DFU writes the download from the start of
 	 * the slot: give DFU a copy with that sector left erased in front.
 	 */
-	if dfuOffset > 0 && sketchBinFile != "" {
+	if dfuOffset > 0 {
 		dfuImg := append(bytes.Repeat([]byte{0xFF}, int(dfuOffset)), finalImg.Bytes()...)
 		dfuFile := strings.Replace(output_file, ".signed.", ".signed.dfu.", 1)
+		if dfuFile == output_file {
+			ext := filepath.Ext(output_file)
+			dfuFile = strings.TrimSuffix(output_file, ext) + ".dfu" + ext
+		}
 		if err := os.WriteFile(dfuFile, dfuImg, 0644); err != nil {
 			log.Fatalf("Failed to write DFU file(%s), error %v", dfuFile, err)
 		}

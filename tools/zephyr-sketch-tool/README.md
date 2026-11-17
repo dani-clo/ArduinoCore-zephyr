@@ -24,3 +24,15 @@ command to build the tool for your platform.
 To build the full set of binaries for all platforms, run the `package_tool.sh`
 script in the parent directory with `../package_tool.sh`, or provide the path
 to this directory as an argument.
+
+### Signing a standalone image
+
+`--squash --loader_bin <image.bin>` also signs an image without a sketch, such
+as the bootloader updater. The image must already reserve space for the
+MCUboot header; its size is read from `CONFIG_ROM_START_OFFSET` in the
+companion `<image>.config` file. The companion `<image>.dts` provides slot sizes.
+
+Use `--output <image.signed.bin>` to choose the signed output path and
+`--dfu_offset <bytes>` to also produce `<image.signed.dfu.bin>` with leading
+erased bytes. `--pem_file`, `--image_version`, and `--erase_flash_dim` work
+as they do for loader + sketch images.

@@ -103,6 +103,10 @@ fi
 
 # Save the build version to loader/VERSION and for later use in local files
 build_version=$(extra/get_core_version.sh loader/VERSION)
+image_version=$(awk -F' *= *' '
+	$1 == "VERSION_MAJOR" { ma = $2 } $1 == "VERSION_MINOR" { mi = $2 }
+	$1 == "PATCHLEVEL" { pl = $2 } $1 == "VERSION_TWEAK" { tw = $2 }
+	END { printf "%d.%d.%d.%d", ma, mi, pl, tw }' loader/VERSION)
 
 # CMake arguments go after a '--' separator, which args may already contain
 [[ " ${args[*]} " == *" -- "* ]] || args+=(--)
@@ -239,18 +243,42 @@ if [ -n "$board" ] && [[ -f firmwares/zephyr-$variant.bin ]]; then
 fi
 # extract FLASH_ERASE_DIM as backup in case this information is not present 
 # in the dts file 
+FLASH_ERASE_DIM=
+DFU_OFFSET=0
 if [[ ! -z $SQUASH_ARGS ]]; then
 	if [[ "$SQUASH_ARGS" =~ --erase_flash_dim[[:space:]]+([^[:space:]]+) ]]; then
 		FLASH_ERASE_DIM="${BASH_REMATCH[1]}"
 	fi
+	if [[ "$SQUASH_ARGS" =~ --dfu_offset[[:space:]]+([^[:space:]]+) ]]; then
+		DFU_OFFSET="${BASH_REMATCH[1]}"
+	fi
 fi
 
-# Build the updater for prebuilt bootloaders. Sysbuild's MCUboot is flashed
-# through a hardware programmer instead.
-if [ -f ${BOOTLOADER_DIR}/bootloader.hex ] && [ ! -f ${BUILD_DIR}/mcuboot/zephyr/.config ]; then
+# Build the updater after its embedded bootloader image is available.
+if [ -f ${BOOTLOADER_DIR}/bootloader.hex ]; then
 	UPDATER_BUILD_DIR=build/updater-${variant}
-	west build -d ${UPDATER_BUILD_DIR} -b ${target} bootloader_updater "${args[@]}"
-	cp ${UPDATER_BUILD_DIR}/zephyr/zephyr.bin ${BOOTLOADER_DIR}/updater.bin
+	updater_args=()
+	UPDATER_IMAGE=zephyr.bin
+	if [ -f ${BUILD_DIR}/mcuboot/zephyr/.config ]; then
+		updater_args=(-DCONFIG_BOOTLOADER_MCUBOOT=y)
+	fi
+	west build -p always -d ${UPDATER_BUILD_DIR} -b ${target} bootloader_updater "${args[@]}" "${updater_args[@]}"
+	if [ -f ${BUILD_DIR}/mcuboot/zephyr/.config ]; then
+		# Use the same signer, key, version and DFU layout as loader + sketch.
+		cp "${UPDATER_BUILD_DIR}/zephyr/.config" "${UPDATER_BUILD_DIR}/zephyr/zephyr.config"
+		go -C tools/zephyr-sketch-tool run . --squash \
+			--loader_bin "$(realpath "${UPDATER_BUILD_DIR}/zephyr/zephyr.bin")" \
+			--pem_file "${KEY_FILE_REALPATH}" --image_version "${image_version}" \
+			--erase_flash_dim "${FLASH_ERASE_DIM:-0}" --dfu_offset "${DFU_OFFSET}" \
+			--output "$(realpath "${UPDATER_BUILD_DIR}/zephyr")/zephyr.signed.bin"
+		UPDATER_IMAGE=zephyr.signed.bin
+		if [ "${DFU_OFFSET}" -gt 0 ]; then
+			UPDATER_IMAGE=zephyr.signed.dfu.bin
+		fi
+		cp "${UPDATER_BUILD_DIR}/zephyr/${UPDATER_IMAGE}" "${UPDATER_BUILD_DIR}/zephyr/updater.bin"
+		UPDATER_IMAGE=updater.bin
+	fi
+	cp "${UPDATER_BUILD_DIR}/zephyr/${UPDATER_IMAGE}" "${BOOTLOADER_DIR}/updater.bin"
 fi
 
 # Generate the provides.ld file for linked builds
@@ -375,10 +403,6 @@ if [ ! -z "$board" ]; then
 
 	# MCUboot image version (major.minor.revision.build) of the squashed
 	# loader+sketch image, as Zephyr signs the loader alone: from loader/VERSION.
-	image_version=$(awk -F' *= *' '
-		$1 == "VERSION_MAJOR" { ma = $2 } $1 == "VERSION_MINOR" { mi = $2 }
-		$1 == "PATCHLEVEL" { pl = $2 } $1 == "VERSION_TWEAK" { tw = $2 }
-		END { printf "%d.%d.%d.%d", ma, mi, pl, tw }' loader/VERSION)
 	update_local_field "build.image_version" "$image_version"
 
 	# sketch load address: start of sketch partition, hex (exact)
