@@ -28,6 +28,9 @@
 #include <zephyr/logging/log.h>
 
 #include "slot1_trailer.h"
+#if defined(CONFIG_ARDUINO_USB_DFU_MSOSV2)
+#include "../cores/arduino/usb_dfu_msosv2.h"
+#endif
 LOG_MODULE_REGISTER(dfu_flash_updates);
 
 /* Sketch layout from the running image's header (zephyr-sketch-tool writes it
@@ -550,6 +553,14 @@ static void dfu_update(void) {
 	}
 
 	usbd_device_set_code_triple(&dfu_usbd, USBD_SPEED_FS, 0, 0, 0);
+
+#if defined(CONFIG_ARDUINO_USB_DFU_MSOSV2)
+	err = arduino_dfu_msos_register(&dfu_usbd, false);
+	if (err != 0) {
+		LOG_ERR("Failed to register DFU Microsoft OS descriptors (%d)", err);
+		return;
+	}
+#endif
 
 	err = usbd_init(&dfu_usbd);
 	if (err) {

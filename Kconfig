@@ -42,6 +42,16 @@ endif
 
 if USB_DEVICE_STACK_NEXT
 
+config ARDUINO_USB_DFU_MSOSV2
+	bool "Microsoft OS 2.0 descriptors for USB DFU"
+	depends on USBD_DFU
+	select USBD_BOS_SUPPORT
+	select USBD_VREQ_SUPPORT
+	help
+	  Advertise WINUSB and a device interface GUID for the DFU function,
+	  allowing Windows 8.1 and later to install WinUSB automatically.
+	  The USB device must have one configuration per speed.
+
 config USB_DEVICE_PRODUCT
 	string "USB Device Product"
 	default "Arduino Generic board"

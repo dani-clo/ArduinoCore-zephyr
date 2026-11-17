@@ -176,7 +176,7 @@ if [ -f ${VARIANT_DIR}/sysbuild.conf ]; then
 	echo "sysbuild key configuration argument: ${key_args[@]}"
 
 	SB_CONF_FILE=$(realpath ${VARIANT_DIR}/sysbuild.conf) \
-		west build -d ${BUILD_DIR} -b ${target} --sysbuild loader "${args[@]}" -- "${key_args[@]}"
+		west build -d ${BUILD_DIR} -b ${target} --sysbuild loader "${args[@]}" "${key_args[@]}"
 	cmake --build ${IMAGE_DIR} --target llext-edk
 else
 	IMAGE_DIR=${BUILD_DIR}

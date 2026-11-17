@@ -363,6 +363,7 @@ FORCE_EXPORT_SYM(usbd_register_all_classes);
 FORCE_EXPORT_SYM(usbd_register_class);
 FORCE_EXPORT_SYM(usbd_add_configuration);
 FORCE_EXPORT_SYM(usbd_caps_speed);
+FORCE_EXPORT_SYM(usbd_bus_speed);
 FORCE_EXPORT_SYM(usbd_can_detect_vbus);
 FORCE_EXPORT_SYM(usbd_enable);
 FORCE_EXPORT_SYM(usbd_disable);

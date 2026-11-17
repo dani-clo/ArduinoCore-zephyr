@@ -18,6 +18,10 @@
 
 #ifdef CONFIG_USB_DEVICE_STACK_NEXT
 
+#if defined(CONFIG_ARDUINO_USB_DFU_MSOSV2)
+#include "usb_dfu_msosv2.h"
+#endif
+
 /* By default, do not register the USB DFU class DFU mode instance; the
  * run-time instance (CONFIG_USBD_DFU) stays for DFU DETACH. */
 static const char *const blocklist[] = {
@@ -52,19 +56,6 @@ USBD_CONFIGURATION_DEFINE(sample_fs_config, attributes, 250, &fs_cfg_desc);
 /* High speed configuration */
 USBD_CONFIGURATION_DEFINE(sample_hs_config, attributes, 250, &hs_cfg_desc);
 /* doc configuration instantiation end */
-
-/*
- * This does not yet provide valuable information, but rather serves as an
- * example, and will be improved in the future.
- */
-static const struct usb_bos_capability_lpm bos_cap_lpm = {
-	.bLength = sizeof(struct usb_bos_capability_lpm),
-	.bDescriptorType = USB_DESC_DEVICE_CAPABILITY,
-	.bDevCapabilityType = USB_BOS_CAPABILITY_EXTENSION,
-	.bmAttributes = 0UL,
-};
-
-USBD_DESC_BOS_DEFINE(sample_usbext, sizeof(bos_cap_lpm), &bos_cap_lpm);
 
 static void sample_fix_code_triple(struct usbd_context *uds_ctx, const enum usbd_speed speed) {
 	/* Always use class code information from Interface Descriptors */
@@ -166,15 +157,12 @@ struct usbd_context *usbd_setup_device(usbd_msg_cb_t msg_cb) {
 		/* doc device init-and-msg end */
 	}
 
-	if (0) {
-		(void)usbd_device_set_bcd_usb(&usbd, USBD_SPEED_FS, 0x0201);
-		(void)usbd_device_set_bcd_usb(&usbd, USBD_SPEED_HS, 0x0201);
-
-		err = usbd_add_descriptor(&usbd, &sample_usbext);
-		if (err) {
-			return NULL;
-		}
+#if defined(CONFIG_ARDUINO_USB_DFU_MSOSV2)
+	err = arduino_dfu_msos_register(&usbd, IS_ENABLED(CONFIG_USBD_CDC_ACM_CLASS));
+	if (err != 0) {
+		return NULL;
 	}
+#endif
 
 	return &usbd;
 }
