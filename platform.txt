@@ -450,6 +450,13 @@ tools.jlink.upload.params.verbose=-v
 tools.jlink.upload.params.quiet=
 tools.jlink.upload.pattern="{path}/{cmd}" -CommanderScript "{build.path}/flasher.jlink"
 
+# "Burn Bootloader" over SWD with J-Link Commander, from the PATH: a board sets
+# swd_flash.tool=jlink and bootloader.target to the J-Link device name. The
+# Commander script, which cannot take the image as an argument, is a temporary
+# file. Not tested on Windows.
+tools.jlink.swd_flash.cmd=sh -c 'f=$(mktemp) || exit 1; printf "r\nh\nloadfile \042%s\042\nr\ng\nexit\n" "$1" > "$f"; "$2" -device "$3" -if SWD -speed 4000 -AutoConnect 1 -NoGui 1 -ExitOnError 1 -CommandFile "$f"; rc=$?; rm -f "$f"; exit $rc' jlink "{swd_flash.image}" "{tools.jlink.cmd}" "{bootloader.target}"
+tools.jlink.swd_flash.cmd.windows=cmd /c '(echo r& echo h& echo loadfile "{swd_flash.image}"& echo r& echo g& echo exit) > "%TEMP%\arduino_swd_flash.jlink" && "{tools.jlink.cmd}" -device {bootloader.target} -if SWD -speed 4000 -AutoConnect 1 -NoGui 1 -ExitOnError 1 -CommandFile "%TEMP%\arduino_swd_flash.jlink"'
+
 
 #
 # Debugger
