@@ -7,7 +7,8 @@ set -e
 
 source venv/bin/activate
 
-ZEPHYR_BASE=$(west topdir)/zephyr
+WEST_TOPDIR=$(west topdir)
+ZEPHYR_BASE=${WEST_TOPDIR}/zephyr
 
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
@@ -20,12 +21,37 @@ if [ x$ZEPHYR_SDK_INSTALL_DIR == x"" ]; then
 	export ZEPHYR_SDK_INSTALL_DIR=${SDK_PATH}
 fi
 
+# '--key <file>' can be given anywhere on the command line: take it out of the
+# arguments used below
+SIGNING_KEY_PATH=""
+remaining_args=()
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--key)
+			if [ $# -lt 2 ]; then
+				log_msg error "--key needs a file argument" >&2
+				exit 1
+			fi
+			SIGNING_KEY_PATH="$2"
+			shift 2
+			;;
+		*)
+			remaining_args+=("$1")
+			shift
+			;;
+	esac
+done
+set -- "${remaining_args[@]}"
+
 if [ $# -eq 0 ] || [ x$1 == x"-h" ] || [ x$1 == x"--help" ]; then
 	cat << EOF
 Usage:
 	$0 <arduino_board>
 	$0 <zephyr_board> [<west_args>]
 Build the loader for the given target.
+
+On boards using MCUboot, '--key <file>' selects the key used to sign the
+images; without it, the publicly known development key of MCUboot is used.
 
 When given an <arduino_board> defined in 'boards.txt' (e.g. 'giga'), the actual
 Zephyr board target and arguments are taken from that definition.
@@ -110,6 +136,32 @@ rm -rf ${BUILD_DIR}
 sysbuild_args=()
 if [ -f ${VARIANT_DIR}/sysbuild.conf ]; then
 	sysbuild_args=(-DSB_CONF_FILE=$(realpath ${VARIANT_DIR}/sysbuild.conf))
+fi
+
+# MCUboot only boots signed images: sign them with the given key, or else
+# with the publicly known MCUboot development key. The key is copied to
+# firmwares/<variant>/, where it is used to sign the sketches too.
+KEY_FILE_NAME=""
+if grep -qs '^SB_CONFIG_BOOTLOADER_MCUBOOT=y' ${VARIANT_DIR}/sysbuild.conf; then
+	if [ -z "${SIGNING_KEY_PATH}" ]; then
+		log_msg warning "No signing key given with --key, using the insecure MCUboot development key"
+		SIGNING_KEY_PATH=${WEST_TOPDIR}/bootloader/mcuboot/root-ec-p256.pem
+		KEY_FILE_NAME=development-key.pem
+	else
+		KEY_FILE_NAME=$(basename "${SIGNING_KEY_PATH}")
+	fi
+	if [ ! -f "${SIGNING_KEY_PATH}" ]; then
+		log_msg error "Signing key '${SIGNING_KEY_PATH}' not found" >&2
+		exit 1
+	fi
+	echo "Signing key: ${SIGNING_KEY_PATH}"
+	mkdir -p firmwares/${variant}
+	rm -f firmwares/${variant}/*.pem
+	cp "${SIGNING_KEY_PATH}" firmwares/${variant}/${KEY_FILE_NAME}
+	# a Kconfig string: the value given with -D must include the quotes
+	sysbuild_args+=(-DSB_CONFIG_BOOT_SIGNATURE_KEY_FILE=\"$(realpath firmwares/${variant}/${KEY_FILE_NAME})\")
+elif [ -n "${SIGNING_KEY_PATH}" ]; then
+	log_msg warning "'${variant}' does not use MCUboot, --key ignored"
 fi
 west build -d ${BUILD_DIR} -b ${target} --sysbuild loader "${args[@]}" "${sysbuild_args[@]}" "${debug_args[@]}"
 
@@ -313,6 +365,11 @@ if [ ! -z "$board" ]; then
 	if [ -f firmwares/${variant}/mcuboot.hex ]; then
 		update_local_field "loader.basename" "loader.signed"
 		update_local_field "burner.basename" "burner.signed"
+	fi
+
+	# the key to sign the sketches with, under MCUboot
+	if [ -n "${KEY_FILE_NAME}" ]; then
+		update_local_field "build.signing_key" "{runtime.platform.path}/firmwares/{build.variant}/${KEY_FILE_NAME}"
 	fi
 
 	# maximum sketch size: size of sketch partition, decimal (exact limit)
