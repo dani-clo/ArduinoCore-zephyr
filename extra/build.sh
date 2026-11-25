@@ -209,7 +209,7 @@ for domain in "${domains[@]}"; do
 	image_dir=${domain#* }/zephyr
 	rm -f firmwares/$variant/$name.*
 	for ext in elf bin hex uf2; do
-		for kind in "" .signed; do
+		for kind in "" .signed .signed.dfu; do
 			if [ -f "$image_dir/zephyr$kind.$ext" ]; then
 				cp "$image_dir/zephyr$kind.$ext" firmwares/$variant/$name$kind.$ext
 			fi

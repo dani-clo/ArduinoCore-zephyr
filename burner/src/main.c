@@ -16,6 +16,11 @@
 #ifdef CONFIG_RETENTION_BOOT_MODE
 #include <zephyr/retention/bootmode.h>
 #endif
+#if defined(CONFIG_SOC_FAMILY_MICROCHIP_PIC32CK_SG_GC)
+#include <zephyr/drivers/flash.h>
+#include <zephyr/drivers/flash/mchp_nvmctrl_g3.h>
+#include <soc.h>
+#endif
 #ifdef CONFIG_BURNER_USB_TOUCH
 #include <zephyr/drivers/uart.h>
 #include <zephyr/sys/iterable_sections.h>
@@ -55,6 +60,104 @@ static bool bootloader_matches(const struct flash_area *fa) {
 	return true;
 }
 
+#if defined(CONFIG_SOC_FAMILY_MICROCHIP_PIC32CK_SG_GC)
+/*
+ * PIC32CK: the bootloader lives in the Boot Flash Memory, write protected
+ * region by region by the FCW. Lift the protection of both BFM banks while
+ * rewriting it, and restore it afterwards, also on failure.
+ */
+static int bfm_write_protect(const struct device *dev, uint32_t lbwp, uint32_t ubwp, bool enable) {
+	uint32_t pages[] = {lbwp & FCW_LBWP_LBWP_Msk, ubwp & FCW_UBWP_UBWP_Msk};
+	int rc = 0;
+
+	for (size_t bank = 0; bank < ARRAY_SIZE(pages); bank++) {
+		struct bfm_exop wp = {
+			.boot_bank = bank == 0 ? BOOT_FLASH_BANK_1 : BOOT_FLASH_BANK_2,
+			.wp_page = enable ? pages[bank] : FCW_LBWP_LBWP_Msk,
+		};
+		int err = flash_ex_op(dev,
+							  enable ? FLASH_EX_OP_BFM_WRITE_PROTECT_ENABLE :
+									   FLASH_EX_OP_BFM_WRITE_PROTECT_DISABLE,
+							  (uintptr_t)&wp, NULL);
+
+		if (rc == 0) {
+			rc = err;
+		}
+	}
+	return rc;
+}
+
+/* restore the saved protection; returns rc, or else the restore error */
+static int bfm_restore_write_protect(const struct device *dev, uint32_t lbwp, uint32_t ubwp,
+									 int rc) {
+	int err = bfm_write_protect(dev, lbwp, ubwp, true);
+
+	if (err == 0 && (FCW_REGS->FCW_LBWP != lbwp || FCW_REGS->FCW_UBWP != ubwp)) {
+		err = -EIO;
+	}
+	if (err) {
+		printk("Failed to restore the boot flash write protection: %d\n", err);
+	}
+	return rc ? rc : err;
+}
+#endif
+
+static int rewrite_bootloader(const struct flash_area *fa) {
+	int rc;
+
+#if defined(CONFIG_SOC_FAMILY_MICROCHIP_PIC32CK_SG_GC)
+	const uint32_t lbwp = FCW_REGS->FCW_LBWP;
+	const uint32_t ubwp = FCW_REGS->FCW_UBWP;
+
+	/* a locked protection cannot be lifted until reset: check before erasing */
+	if ((lbwp & FCW_LBWP_LBWPLOCK_Msk) != 0 || (ubwp & FCW_UBWP_UBWPLOCK_Msk) != 0) {
+		printk("Boot flash write protection locked\n");
+		return -EACCES;
+	}
+	rc = bfm_write_protect(fa->fa_dev, lbwp, ubwp, false);
+	if (rc == 0 && ((FCW_REGS->FCW_LBWP & FCW_LBWP_LBWP_Msk) != 0 ||
+					(FCW_REGS->FCW_UBWP & FCW_UBWP_UBWP_Msk) != 0)) {
+		rc = -EACCES;
+	}
+	if (rc) {
+		printk("Failed to lift the boot flash write protection: %d\n", rc);
+		goto out;
+	}
+#endif
+
+	rc = flash_area_erase(fa, 0, fa->fa_size);
+	if (rc) {
+		printk("Erase failed: %d\n", rc);
+		goto out;
+	}
+
+#if defined(CONFIG_SOC_FAMILY_MICROCHIP_PIC32CK_SG_GC)
+	/* row programming reads its source through the SRAM bus, not from flash */
+	static uint8_t row[DT_PROP(DT_NODELABEL(flash0), write_block_size_row)] __aligned(4);
+
+	for (size_t off = 0; off < sizeof(bootloader); off += sizeof(row)) {
+		size_t len = MIN(sizeof(row), sizeof(bootloader) - off);
+
+		memcpy(row, &bootloader[off], len);
+		rc = flash_area_write(fa, off, row, len);
+		if (rc) {
+			break;
+		}
+	}
+#else
+	rc = flash_area_write(fa, 0, bootloader, sizeof(bootloader));
+#endif
+	if (rc) {
+		printk("Write failed: %d\n", rc);
+	}
+
+out:
+#if defined(CONFIG_SOC_FAMILY_MICROCHIP_PIC32CK_SG_GC)
+	rc = bfm_restore_write_protect(fa->fa_dev, lbwp, ubwp, rc);
+#endif
+	return rc;
+}
+
 static int update_bootloader(void) {
 	const struct flash_area *fa;
 	int rc;
@@ -78,14 +181,8 @@ static int update_bootloader(void) {
 	}
 
 	printk("Updating bootloader (%u bytes)...\n", (unsigned int)sizeof(bootloader));
-	rc = flash_area_erase(fa, 0, fa->fa_size);
+	rc = rewrite_bootloader(fa);
 	if (rc) {
-		printk("Erase failed: %d\n", rc);
-		goto out;
-	}
-	rc = flash_area_write(fa, 0, bootloader, sizeof(bootloader));
-	if (rc) {
-		printk("Write failed: %d\n", rc);
 		goto out;
 	}
 	if (!bootloader_matches(fa)) {

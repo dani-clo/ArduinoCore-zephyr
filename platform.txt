@@ -355,6 +355,13 @@ tools.dfu-util.dual_dfu.sketch.cmd="{path}/{cmd}" --device ,{upload_port.2.vid}:
 tools.dfu-util.dual_dfu.mcuboot.cmd="{path}/{cmd}" --device ,{upload_port.1.vid}:{upload_port.1.pid} -D "{upload.artifacts.sketch}" -a0
 tools.dfu-util.dual_dfu.pattern="{runtime.tools.scripting-tools.path}/scripting-tools" if eq "v{upload.port.properties.pid}" "vnone" {tools.dfu-util.dual_dfu.mcuboot.cmd} :: if not eq "v{upload.port.properties.pid}" "vnone" {tools.dfu-util.dual_dfu.detach.cmd} :: if and not eq "v{upload.port.properties.pid}" "vnone" {flash-loader-condition} {tools.dfu-util.dual_dfu.full.cmd} :: if and not eq "v{upload.port.properties.pid}" "vnone" not {flash-loader-condition} {tools.dfu-util.dual_dfu.sketch.cmd}
 
+# "Burn Bootloader" with the burner app on the same boards: the burner image
+# (iap_flash.image, upload.artifacts.loader) is always uploaded in full at alt 0,
+# through MCUboot's DFU without a port, else through the loader's DFU.
+tools.dfu-util.dual_dfu.iap_flash.full.cmd="{path}/{cmd}" --device ,{upload_port.2.vid}:{upload_port.2.pid} -S {upload.port.properties.serialNumber} -D "{upload.artifacts.loader}" -a0 -w
+tools.dfu-util.dual_dfu.iap_flash.mcuboot.cmd="{path}/{cmd}" --device ,{upload_port.1.vid}:{upload_port.1.pid} -D "{upload.artifacts.loader}" -a0
+tools.dfu-util.dual_dfu.iap_flash.pattern="{runtime.tools.scripting-tools.path}/scripting-tools" if eq "v{upload.port.properties.pid}" "vnone" {tools.dfu-util.dual_dfu.iap_flash.mcuboot.cmd} :: if not eq "v{upload.port.properties.pid}" "vnone" {tools.dfu-util.dual_dfu.detach.cmd} :: if not eq "v{upload.port.properties.pid}" "vnone" {tools.dfu-util.dual_dfu.iap_flash.full.cmd}
+
 tools.dfu-util-port.path={runtime.tools.dfu-util.path}
 tools.dfu-util-port.cmd=dfu-util
 tools.dfu-util-port.upload.params.verbose=-d

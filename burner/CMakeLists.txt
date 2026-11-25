@@ -62,3 +62,26 @@ add_custom_command(
 generate_inc_file_for_target(app ${bootloader_bin} ${gen_dir}/bootloader.bin.inc)
 
 target_sources(app PRIVATE src/main.c)
+
+# MCUboot in swap-using-offset mode expects the update one sector into the
+# secondary slot, while its USB DFU writes from the start of the slot: also
+# write a DFU copy of the signed burner, starting with one erased sector.
+if(CONFIG_BOOTLOADER_MCUBOOT AND CONFIG_MCUBOOT_BOOTLOADER_MODE_SWAP_USING_OFFSET)
+	dt_nodelabel(slot1_partition NODELABEL slot1_partition REQUIRED)
+	dt_reg_size(slot1_size PATH ${slot1_partition})
+	# the partition's grandparent is the flash device
+	get_filename_component(slot1_flash ${slot1_partition} DIRECTORY)
+	get_filename_component(slot1_flash ${slot1_flash} DIRECTORY)
+	dt_prop(slot1_erase_size PATH ${slot1_flash} PROPERTY erase-block-size REQUIRED)
+
+	set(signed_bin ${ZEPHYR_BINARY_DIR}/${KERNEL_NAME}.signed.bin)
+	set(dfu_bin ${ZEPHYR_BINARY_DIR}/${KERNEL_NAME}.signed.dfu.bin)
+	add_custom_command(
+		OUTPUT ${dfu_bin}
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/dfu_pad.py
+			${signed_bin} ${dfu_bin} ${slot1_erase_size} ${slot1_size}
+		DEPENDS zephyr_final ${CMAKE_CURRENT_LIST_DIR}/scripts/dfu_pad.py
+		VERBATIM
+	)
+	add_custom_target(burner_dfu ALL DEPENDS ${dfu_bin})
+endif()

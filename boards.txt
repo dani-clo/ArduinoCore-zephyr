@@ -784,7 +784,10 @@ nanoxllink.upload.port.properties.configuration=
 nanoxllink.tools.dfu-util.upload.pattern={tools.dfu-util.dual_dfu.pattern}
 
 # "Burn Bootloader": MCUboot (mcuboot.hex, built by sysbuild) over SWD with
-# J-Link Commander.
+# J-Link Commander, or the signed burner, padded for the MCUboot DFU, with the
+# burner app through the same DFUs as the sketch.
 nanoxllink.swd_flash.tool=jlink
 nanoxllink.bootloader.target=PIC32CK2051SG
+nanoxllink.iap_flash.image={runtime.platform.path}/firmwares/{build.variant}/{burner.basename}.dfu.bin
+nanoxllink.tools.dfu-util.iap_flash.cmd={tools.dfu-util.dual_dfu.iap_flash.pattern}
 
