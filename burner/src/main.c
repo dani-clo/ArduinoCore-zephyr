@@ -21,6 +21,9 @@
 #include <zephyr/drivers/flash/mchp_nvmctrl_g3.h>
 #include <soc.h>
 #endif
+#if CONFIG_BURNER_WATCHDOG_TIMEOUT_MS > 0
+#include <zephyr/drivers/watchdog.h>
+#endif
 #ifdef CONFIG_BURNER_USB_TOUCH
 #include <zephyr/drivers/uart.h>
 #include <zephyr/sys/iterable_sections.h>
@@ -237,7 +240,44 @@ static void dwt_disable_watchpoints(void) {
 }
 #endif
 
+#if CONFIG_BURNER_WATCHDOG_TIMEOUT_MS > 0
+/*
+ * The bootloader started the watchdog, as for the loader: install a channel
+ * with the same timeout (not calling wdt_setup(), the timer already runs) and
+ * feed it, so that the burner is not reset before showing its result.
+ */
+static const struct device *const wdt = DEVICE_DT_GET(DT_ALIAS(watchdog0));
+static int wdt_channel = -1;
+
+static void watchdog_init(void) {
+	const struct wdt_timeout_cfg cfg = {
+		.window = {.min = 0, .max = CONFIG_BURNER_WATCHDOG_TIMEOUT_MS},
+		.flags = WDT_FLAG_RESET_SOC,
+	};
+
+	if (device_is_ready(wdt)) {
+		wdt_channel = wdt_install_timeout(wdt, &cfg);
+	}
+	if (wdt_channel < 0) {
+		printk("Watchdog not available: %d\n", wdt_channel);
+	}
+}
+
+static void watchdog_feed(void) {
+	if (wdt_channel >= 0) {
+		(void)wdt_feed(wdt, wdt_channel);
+	}
+}
+#else
+static inline void watchdog_init(void) {
+}
+
+static inline void watchdog_feed(void) {
+}
+#endif
+
 int main(void) {
+	watchdog_init();
 #ifdef CONFIG_CPU_CORTEX_M_HAS_DWT
 	dwt_disable_watchpoints();
 #endif
@@ -262,6 +302,7 @@ int main(void) {
 	while (true) {
 		gpio_pin_toggle_dt(&led);
 		for (int ms = 0; ms < period_ms; ms += 100) {
+			watchdog_feed();
 #ifdef CONFIG_BURNER_USB_TOUCH
 			check_1200_bps_touch();
 #endif

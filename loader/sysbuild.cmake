@@ -62,6 +62,12 @@ if(SB_CONFIG_BOOTLOADER_MCUBOOT)
   # the loader, applying the main image defaults (MCUboot mode, signing key)
   set_property(TARGET burner APPEND PROPERTY IMAGE_CONF_SCRIPT
     ${ZEPHYR_BASE}/share/sysbuild/image_configurations/MAIN_image_default.cmake)
+  # the burner runs in the loader slot, under the watchdog MCUboot started:
+  # it feeds it as the loader does, so its result stays visible until reset
+  if(SB_CONFIG_ENFORCE_SECURE_WATCHDOG)
+    set_config_bool(burner CONFIG_WATCHDOG y)
+    set_config_int(burner CONFIG_BURNER_WATCHDOG_TIMEOUT_MS ${SB_CONFIG_SECURE_WATCHDOG_TIMEOUT_MS})
+  endif()
 endif()
 
 # MCUboot hooks shared by the variants (DFU boot mode, update policy);

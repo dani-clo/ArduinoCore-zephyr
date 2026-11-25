@@ -54,4 +54,10 @@ config CDC_ACM_SERIAL_PRODUCT_STRING
 
 endif
 
+# Under MCUboot with SB_CONFIG_ENFORCE_SECURE_WATCHDOG, the watchdog started
+# by MCUboot (see loader/sysbuild.cmake), which the burner feeds; 0: none
+config BURNER_WATCHDOG_TIMEOUT_MS
+	int "Timeout of the watchdog started by the bootloader (0: none)"
+	default 0
+
 source "Kconfig.zephyr"
