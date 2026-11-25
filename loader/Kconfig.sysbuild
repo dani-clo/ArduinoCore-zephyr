@@ -11,3 +11,12 @@ config SECURE_WATCHDOG_TIMEOUT_MS
     int "Watchdog timeout in milliseconds"
     depends on ENFORCE_SECURE_WATCHDOG
     default 20000
+
+config ARDUINO_MCUBOOT_USB_DFU
+    bool "MCUboot recovers over USB DFU instead of serial recovery"
+    depends on BOOTLOADER_MCUBOOT
+    help
+      Build MCUboot with mcuboot/prj_usb_dfu.conf instead of mcuboot/prj.conf:
+      a USB DFU device writing the secondary slot, entered through the
+      retention boot mode (loader/mcuboot_hooks), instead of SMP serial
+      recovery over CDC ACM.

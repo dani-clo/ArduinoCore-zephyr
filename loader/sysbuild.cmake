@@ -11,13 +11,19 @@ if(SB_CONFIG_BOOTLOADER_MCUBOOT)
   # the MCUboot snippets are in mcuboot/snippets
   set(mcuboot_SNIPPET_ROOT ${CMAKE_CURRENT_LIST_DIR}/../mcuboot
     CACHE INTERNAL "MCUboot snippet root")
-  # serial recovery replies must not be truncated, see mcuboot/snippets: add
-  # the snippet to any given with -Dmcuboot_SNIPPET (sysbuild only passes cache
-  # variables to the images)
-  set(mcuboot_snippets $CACHE{mcuboot_SNIPPET})
-  if(NOT mcuboot-cdc-flow-control IN_LIST mcuboot_snippets)
-    list(APPEND mcuboot_snippets mcuboot-cdc-flow-control)
-    set(mcuboot_SNIPPET "${mcuboot_snippets}" CACHE STRING "MCUboot snippets" FORCE)
+  if(SB_CONFIG_ARDUINO_MCUBOOT_USB_DFU)
+    # USB DFU recovery: prj_usb_dfu.conf replaces prj.conf (serial recovery),
+    # and boards/<board>_usb_dfu.conf, if any, the board's own .conf
+    set(mcuboot_FILE_SUFFIX usb_dfu CACHE INTERNAL "MCUboot configuration suffix")
+  else()
+    # serial recovery replies must not be truncated, see mcuboot/snippets: add
+    # the snippet to any given with -Dmcuboot_SNIPPET (sysbuild only passes cache
+    # variables to the images)
+    set(mcuboot_snippets $CACHE{mcuboot_SNIPPET})
+    if(NOT mcuboot-cdc-flow-control IN_LIST mcuboot_snippets)
+      list(APPEND mcuboot_snippets mcuboot-cdc-flow-control)
+      set(mcuboot_SNIPPET "${mcuboot_snippets}" CACHE STRING "MCUboot snippets" FORCE)
+    endif()
   endif()
 endif()
 
